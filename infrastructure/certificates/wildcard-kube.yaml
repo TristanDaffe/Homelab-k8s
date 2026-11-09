@@ -13,8 +13,8 @@ spec:
     - kube.autostack.ovh
   issuerRef:
     kind: ClusterIssuer
-    # letsencrypt-staging until the chain is proven, then letsencrypt-prod
-    name: letsencrypt-staging
+    # Proven with letsencrypt-staging first; use staging again to test changes
+    name: letsencrypt-prod
   privateKey:
     algorithm: ECDSA
     size: 256
