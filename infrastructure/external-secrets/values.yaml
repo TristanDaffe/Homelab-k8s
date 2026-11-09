@@ -1,0 +1,14 @@
+# External Secrets Operator (chart external-secrets/external-secrets): turns
+# ExternalSecret objects into Kubernetes Secrets, reading the values from
+# Infisical (https://pass.autostack.ovh, on DevTools) through the "infisical"
+# ClusterSecretStore in infrastructure/external-secrets-config.
+installCRDs: true
+
+resources:
+  requests: {cpu: 10m, memory: 64Mi}
+webhook:
+  resources:
+    requests: {cpu: 10m, memory: 32Mi}
+certController:
+  resources:
+    requests: {cpu: 10m, memory: 32Mi}

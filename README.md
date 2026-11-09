@@ -12,7 +12,8 @@ repository. The cluster itself (VMs, k3s install, Argo CD bootstrap) lives in
 | `infrastructure/argocd/` | Argo CD Helm values |
 | `infrastructure/kube-vip/` | kube-vip (Services mode, ARP) values |
 | `infrastructure/traefik/` | HelmChartConfig for the k3s Traefik (floating IP annotation) |
-| `infrastructure/cert-manager/`, `cert-manager-webhook-ovh/` | cert-manager + OVH DNS-01 webhook; ClusterIssuers `letsencrypt-staging` / `letsencrypt-prod` (OVH keys: Secret `cert-manager/ovh-credentials` from Homelab-infra SOPS) |
+| `infrastructure/cert-manager/`, `cert-manager-webhook-ovh/` | cert-manager + OVH DNS-01 webhook; ClusterIssuers `letsencrypt-staging` / `letsencrypt-prod` (OVH keys: Secret `cert-manager/ovh-credentials`, from Infisical) |
+| `infrastructure/external-secrets/`, `external-secrets-config/` | External Secrets Operator + ClusterSecretStore `infisical` (project `homelab-k8s`, env `prod`, one folder per consumer); ExternalSecrets for add-ons, e.g. `cert-manager/ovh-credentials` ← `/cert-manager/*` |
 | `infrastructure/certificates/` | Wildcard `*.kube.autostack.ovh` certificate, served by Traefik as its default certificate (`TLSStore default`) — apps need no TLS config |
 | `infrastructure/` (planned) | Cluster add-ons, synced in this order: kube-vip (ingress floating IP for `*.autostack.ovh`) → Longhorn → cert-manager + OVH DNS-01 webhook → External Secrets (Infisical) → monitoring |
 | `apps/<name>/values.yaml` | One app per folder, deployed with the bjw-s `app-template` chart (version set in `bootstrap/apps.yaml`) into namespace `<name>` |
@@ -29,5 +30,5 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.pas
 
 - **Storage:** Longhorn by default (`longhorn`, 2 replicas); `longhorn-single` (1 replica) for Prometheus/Loki; `local-path` for caches. SQLite apps keep SQLite on Longhorn.
 - **Databases:** apps that already use PostgreSQL connect to the Patroni cluster on the floating IP `192.168.129.140:5432` (one database and role per app).
-- **Secrets:** External Secrets Operator reading from Infisical. Nothing secret is committed here.
+- **Secrets:** values live in Infisical (`https://pass.autostack.ovh`, project `homelab-k8s`, env `prod`, folder per app); an `ExternalSecret` (`secretStoreRef: ClusterSecretStore/infisical`, absolute keys like `/myapp/KEY`) turns them into a Kubernetes Secret. Nothing secret is committed here. The only bootstrap secret, the Infisical machine identity, is created by Ansible from Homelab-infra SOPS.
 - **CI:** `helm template` + `kubeconform` on pull requests; Argo CD does the deploying.
