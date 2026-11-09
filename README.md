@@ -12,6 +12,8 @@ repository. The cluster itself (VMs, k3s install, Argo CD bootstrap) lives in
 | `infrastructure/argocd/` | Argo CD Helm values |
 | `infrastructure/kube-vip/` | kube-vip (Services mode, ARP) values |
 | `infrastructure/traefik/` | HelmChartConfig for the k3s Traefik (floating IP annotation) |
+| `infrastructure/cert-manager/`, `cert-manager-webhook-ovh/` | cert-manager + OVH DNS-01 webhook; ClusterIssuers `letsencrypt-staging` / `letsencrypt-prod` (OVH keys: Secret `cert-manager/ovh-credentials` from Homelab-infra SOPS) |
+| `infrastructure/certificates/` | Wildcard `*.kube.autostack.ovh` certificate, served by Traefik as its default certificate (`TLSStore default`) — apps need no TLS config |
 | `infrastructure/` (planned) | Cluster add-ons, synced in this order: kube-vip (ingress floating IP for `*.autostack.ovh`) → Longhorn → cert-manager + OVH DNS-01 webhook → External Secrets (Infisical) → monitoring |
 | `apps/<name>/values.yaml` | One app per folder, deployed with the bjw-s `app-template` chart (version set in `bootstrap/apps.yaml`) into namespace `<name>` |
 

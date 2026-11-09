@@ -1,0 +1,21 @@
+# One wildcard certificate for every app under *.kube.autostack.ovh, served by
+# Traefik as its default certificate (tlsstore.yaml): ingresses need no TLS
+# section of their own.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-kube-autostack-ovh
+  namespace: kube-system
+spec:
+  secretName: wildcard-kube-autostack-ovh-tls
+  dnsNames:
+    - "*.kube.autostack.ovh"
+    - kube.autostack.ovh
+  issuerRef:
+    kind: ClusterIssuer
+    # letsencrypt-staging until the chain is proven, then letsencrypt-prod
+    name: letsencrypt-staging
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+    rotationPolicy: Always

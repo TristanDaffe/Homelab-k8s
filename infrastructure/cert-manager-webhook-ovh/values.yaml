@@ -1,0 +1,24 @@
+# DNS-01 solver for OVH (chart cert-manager-webhook-ovh), and the ClusterIssuers
+# that use it. The OVH API keys are in Secret cert-manager/ovh-credentials,
+# created from SOPS by the Homelab-infra argocd role (argocd_bootstrap_secrets).
+groupName: acme.autostack.ovh
+certManager:
+  namespace: cert-manager
+  serviceAccountName: cert-manager
+
+issuers:
+  - &issuer
+    name: letsencrypt-staging
+    create: true
+    kind: ClusterIssuer
+    acmeServerUrl: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: seurya2@gmail.com
+    ovhEndpointName: ovh-eu
+    ovhAuthenticationMethod: application
+    ovhAuthenticationRef:
+      applicationKeyRef: {name: ovh-credentials, key: applicationKey}
+      applicationSecretRef: {name: ovh-credentials, key: applicationSecret}
+      applicationConsumerKeyRef: {name: ovh-credentials, key: applicationConsumerKey}
+  - <<: *issuer
+    name: letsencrypt-prod
+    acmeServerUrl: https://acme-v02.api.letsencrypt.org/directory

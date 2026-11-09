@@ -1,0 +1,10 @@
+# Traefik's default certificate: used for every HTTPS request whose router has
+# no certificate of its own (TLSStore must be named "default", in Traefik's namespace)
+apiVersion: traefik.io/v1alpha1
+kind: TLSStore
+metadata:
+  name: default
+  namespace: kube-system
+spec:
+  defaultCertificate:
+    secretName: wildcard-kube-autostack-ovh-tls
