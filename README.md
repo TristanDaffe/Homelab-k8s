@@ -13,10 +13,11 @@ repository. The cluster itself (VMs, k3s install, Argo CD bootstrap) lives in
 | `infrastructure/` (planned) | Cluster add-ons, synced in this order: kube-vip (ingress floating IP for `*.autostack.ovh`) → Longhorn → cert-manager + OVH DNS-01 webhook → External Secrets (Infisical) → monitoring |
 | `apps/<name>/values.yaml` | One app per folder, deployed with the bjw-s `app-template` chart (version set in `bootstrap/apps.yaml`) into namespace `<name>` |
 
-Argo CD reads this repo over SSH with a read-only **deploy key** (`argocd@k3s`); its private half is in the `Homelab-infra` SOPS secrets. Until an ingress with TLS exists, open the UI with:
+Argo CD reads this repo over SSH with a read-only **deploy key** (`argocd@k3s`); its private half is in the `Homelab-infra` SOPS secrets.
+
+Apps are published under `*.kube.autostack.ovh` (OVH wildcard → `k8s-cp-1` 192.168.129.130 until kube-vip provides a floating IP). Argo CD UI: `http://argocd.kube.autostack.ovh`, user `admin`:
 
 ```bash
-kubectl -n argocd port-forward svc/argocd-server 8080:80   # http://localhost:8080, user admin
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
 ```
 

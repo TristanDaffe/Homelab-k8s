@@ -3,12 +3,12 @@
 # (Homelab-infra: ansible/configure/argocd.yaml) with a minimal subset of these
 # values; keep the two in step for anything needed to reach this repo.
 global:
-  domain: argocd.k8s.autostack.ovh
+  domain: argocd.kube.autostack.ovh
 
 configs:
   params:
-    # TLS is terminated by the ingress (later: cert-manager); the UI is reached
-    # with `kubectl port-forward` until then
+    # TLS is terminated by the ingress (Traefik; real certificate once
+    # cert-manager is installed)
     server.insecure: true
   ssh:
     # Forgejo's SSH port (repo URL ssh://git@git.autostack.ovh:222/...)
@@ -28,6 +28,11 @@ repoServer:
   resources:
     requests: {cpu: 50m, memory: 128Mi}
 server:
+  # UI on argocd.kube.autostack.ovh (hostname defaults to global.domain).
+  # *.kube.autostack.ovh points at k8s-cp-1 until kube-vip provides a floating IP
+  ingress:
+    enabled: true
+    ingressClassName: traefik
   resources:
     requests: {cpu: 50m, memory: 96Mi}
 applicationSet:

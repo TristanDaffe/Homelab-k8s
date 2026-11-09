@@ -1,6 +1,6 @@
 # IT-Tools — stateless, first app used to prove Git → Argo CD → cluster → ingress.
-# Test host until cert-manager + kube-vip + DNS exist:
-#   curl --resolve it-tools.k8s.autostack.ovh:80:192.168.129.130 http://it-tools.k8s.autostack.ovh/
+# *.kube.autostack.ovh points at k8s-cp-1 (Traefik); HTTPS uses Traefik's
+# self-signed certificate until cert-manager is installed
 controllers:
   it-tools:
     containers:
@@ -26,7 +26,7 @@ ingress:
   app:
     className: traefik
     hosts:
-      - host: it-tools.k8s.autostack.ovh
+      - host: it-tools.kube.autostack.ovh
         paths:
           - path: /
             pathType: Prefix
