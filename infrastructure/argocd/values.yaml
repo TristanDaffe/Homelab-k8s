@@ -1,0 +1,38 @@
+# Argo CD values (chart argo/argo-cd). Argo CD manages itself from this file
+# through bootstrap/argocd.yaml. The first install is done once by Ansible
+# (Homelab-infra: ansible/configure/argocd.yaml) with a minimal subset of these
+# values; keep the two in step for anything needed to reach this repo.
+global:
+  domain: argocd.k8s.autostack.ovh
+
+configs:
+  params:
+    # TLS is terminated by the ingress (later: cert-manager); the UI is reached
+    # with `kubectl port-forward` until then
+    server.insecure: true
+  ssh:
+    # Forgejo's SSH port (repo URL ssh://git@git.autostack.ovh:222/...)
+    extraHosts: |
+      [git.autostack.ovh]:222 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILFjjqs865c4gIBsY3sBbo9fDn8Xt0hupaU0mCAmBsMr
+
+# Not used yet: SSO comes with Pocket ID, notifications later
+dex:
+  enabled: false
+notifications:
+  enabled: false
+
+controller:
+  resources:
+    requests: {cpu: 100m, memory: 256Mi}
+repoServer:
+  resources:
+    requests: {cpu: 50m, memory: 128Mi}
+server:
+  resources:
+    requests: {cpu: 50m, memory: 96Mi}
+applicationSet:
+  resources:
+    requests: {cpu: 20m, memory: 64Mi}
+redis:
+  resources:
+    requests: {cpu: 20m, memory: 32Mi}

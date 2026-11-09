@@ -1,0 +1,35 @@
+# IT-Tools — stateless, first app used to prove Git → Argo CD → cluster → ingress.
+# Test host until cert-manager + kube-vip + DNS exist:
+#   curl --resolve it-tools.k8s.autostack.ovh:80:192.168.129.130 http://it-tools.k8s.autostack.ovh/
+controllers:
+  it-tools:
+    containers:
+      app:
+        image:
+          repository: corentinth/it-tools
+          tag: 2024.10.22-7ca5933
+        resources:
+          requests: {cpu: 10m, memory: 32Mi}
+          limits: {memory: 128Mi}
+        probes:
+          liveness: {enabled: true}
+          readiness: {enabled: true}
+
+service:
+  app:
+    controller: it-tools
+    ports:
+      http:
+        port: 80
+
+ingress:
+  app:
+    className: traefik
+    hosts:
+      - host: it-tools.k8s.autostack.ovh
+        paths:
+          - path: /
+            pathType: Prefix
+            service:
+              identifier: app
+              port: http

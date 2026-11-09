@@ -1,0 +1,43 @@
+# Every folder apps/<name>/ becomes an Application "<name>" in namespace "<name>",
+# deployed with the bjw-s app-template chart and apps/<name>/values.yaml.
+# Adding or removing a folder adds or removes the app.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: apps
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: ssh://git@git.autostack.ovh:222/Susu/Homelab-k8S.git
+        revision: main
+        directories:
+          - path: apps/*
+  template:
+    metadata:
+      name: '{{ .path.basename }}'
+    spec:
+      project: default
+      sources:
+        - repoURL: https://bjw-s-labs.github.io/helm-charts
+          chart: app-template
+          targetRevision: 5.3.0
+          helm:
+            releaseName: '{{ .path.basename }}'
+            valueFiles:
+              - '$values/{{ .path.path }}/values.yaml'
+        - repoURL: ssh://git@git.autostack.ovh:222/Susu/Homelab-k8S.git
+          targetRevision: main
+          ref: values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{ .path.basename }}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
