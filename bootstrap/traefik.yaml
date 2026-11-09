@@ -1,0 +1,19 @@
+# Settings for the k3s-bundled Traefik (HelmChartConfig), see infrastructure/traefik
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: ssh://git@git.autostack.ovh:222/Susu/Homelab-k8S.git
+    targetRevision: main
+    path: infrastructure/traefik
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

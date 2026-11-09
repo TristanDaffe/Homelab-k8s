@@ -1,0 +1,28 @@
+# Floating IPs for LoadBalancer Services (ARP), see infrastructure/kube-vip
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-vip
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://kube-vip.github.io/helm-charts
+      chart: kube-vip
+      targetRevision: 0.11.2
+      helm:
+        releaseName: kube-vip
+        valueFiles:
+          - $values/infrastructure/kube-vip/values.yaml
+    - repoURL: ssh://git@git.autostack.ovh:222/Susu/Homelab-k8S.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true

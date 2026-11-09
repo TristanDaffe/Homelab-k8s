@@ -1,0 +1,13 @@
+# Overrides for the Traefik that k3s installs (HelmChart kube-system/traefik).
+# kube-vip gives its LoadBalancer Service the ingress floating IP;
+# *.kube.autostack.ovh points there.
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    service:
+      annotations:
+        kube-vip.io/loadbalancerIPs: 192.168.129.139

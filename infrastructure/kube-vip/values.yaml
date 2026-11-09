@@ -1,0 +1,18 @@
+# kube-vip (chart kube-vip/kube-vip) in Services mode: announces LoadBalancer
+# IPs on the LAN with ARP. One node holds each IP (per-service leader election)
+# and another node takes it over if that node goes down.
+# k3s ServiceLB is disabled (Homelab-infra k3s role, k3s_disable) so it does
+# not compete for the same Services.
+env:
+  vip_interface: eth0
+  vip_arp: "true"
+  # Services only: no control-plane VIP, no IPVS load balancer
+  cp_enable: "false"
+  lb_enable: "false"
+  svc_enable: "true"
+  svc_election: "true"
+  vip_leaderelection: "false"
+
+resources:
+  requests: {cpu: 10m, memory: 32Mi}
+  limits: {memory: 96Mi}
