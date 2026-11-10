@@ -1,6 +1,5 @@
-# Overrides for the Traefik that k3s installs (HelmChart kube-system/traefik).
-# kube-vip gives its LoadBalancer Service the ingress floating IP;
-# *.kube.autostack.ovh points there.
+# Overrides for the Traefik that k3s installs (HelmChart kube-system/traefik,
+# chart traefik 40.x). Keys: https://github.com/traefik/traefik-helm-chart
 apiVersion: helm.cattle.io/v1
 kind: HelmChartConfig
 metadata:
@@ -8,6 +7,25 @@ metadata:
   namespace: kube-system
 spec:
   valuesContent: |-
+    # kube-vip gives the LoadBalancer Service the ingress floating IP;
+    # *.kube.autostack.ovh points there
     service:
       annotations:
         kube-vip.io/loadbalancerIPs: 192.168.129.139
+
+    # Every plain-HTTP request is redirected to HTTPS (permanent)
+    ports:
+      web:
+        http:
+          redirections:
+            entryPoint:
+              to: websecure
+              scheme: https
+              permanent: true
+
+    # Lets an app's Ingress use a Middleware from another namespace, e.g.
+    #   traefik.ingress.kubernetes.io/router.middlewares: tinyauth-forwardauth@kubernetescrd
+    # (TinyAuth's forwardAuth lives in its own namespace)
+    providers:
+      kubernetesCRD:
+        allowCrossNamespace: true
