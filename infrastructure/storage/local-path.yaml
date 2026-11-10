@@ -1,0 +1,13 @@
+# k3s's node-local StorageClass, kept for caches but no longer the default
+# ("longhorn" is). k3s created it; Argo CD only owns the default-class
+# annotation (server-side apply) and puts it back if k3s ever resets it.
+# The other fields must match what k3s created (they are immutable).
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-path
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: rancher.io/local-path
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer

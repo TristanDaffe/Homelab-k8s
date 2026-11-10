@@ -1,0 +1,29 @@
+# Replicated block storage, see infrastructure/longhorn
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://charts.longhorn.io
+      chart: longhorn
+      targetRevision: 1.13.0
+      helm:
+        releaseName: longhorn
+        valueFiles:
+          - $values/infrastructure/longhorn/values.yaml
+    - repoURL: ssh://git@git.autostack.ovh:222/Susu/Homelab-k8S.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: longhorn-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

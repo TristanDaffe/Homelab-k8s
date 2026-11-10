@@ -1,0 +1,34 @@
+# Longhorn (chart longhorn/longhorn): replicated block storage on each node's
+# data disk (/var/lib/longhorn = VM scsi1, prepared by the Homelab-infra k3s
+# role, tag k3s-longhorn). Both k3s VMs are on pve-dev-2 for now, so replicas
+# protect against a VM failure, not the loss of that physical host.
+
+# The pre-upgrade check is a Helm hook Job; Argo CD does not run Helm hooks the
+# way Helm does (Longhorn docs: disable it with Argo CD)
+preUpgradeChecker:
+  jobEnabled: false
+
+# StorageClass "longhorn" — the cluster default
+persistence:
+  defaultClass: true
+  defaultFsType: ext4
+  defaultClassReplicaCount: 2
+  defaultDataLocality: best-effort
+  # Retain: Argo CD prunes what leaves Git; with Delete, removing an app folder
+  # would delete its PVC and the data with it. Released PVs are cleaned by hand.
+  reclaimPolicy: Retain
+
+defaultSettings:
+  defaultDataPath: /var/lib/longhorn
+  defaultReplicaCount: 2
+  defaultDataLocality: best-effort
+  # Keep 15% of each data disk free
+  storageMinimalAvailablePercentage: 15
+  # When a node dies, delete its StatefulSet/Deployment pods so the volume can
+  # attach on the other node (default "do-nothing" leaves them stuck)
+  nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
+
+longhornUI:
+  # No login on the UI: no ingress until Pocket ID / TinyAuth protects it.
+  # kubectl -n longhorn-system port-forward svc/longhorn-frontend 8081:80
+  replicas: 1
