@@ -3,9 +3,10 @@
 #
 # Every PVC of this class, in any namespace, mounts this SAME existing folder
 # (fixed subDir). Downloads and libraries live in one mount, so hardlinks and
-# atomic moves between them keep working. No provisioner secret: the driver
-# never creates or deletes folders on the NAS; onDelete/Retain keep the files
-# when a PVC is removed.
+# atomic moves between them keep working. The controller mounts the share when
+# a PVC is created (mkdir -p subDir, a no-op since mac-mini exists), so it needs
+# the provisioner secret too; onDelete: retain + Retain mean nothing is ever
+# deleted on the NAS when a PVC/PV goes away.
 #
 # Never put SQLite or other databases on it (CIFS locking): app configs stay on
 # Longhorn.
@@ -13,6 +14,10 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: nas-media
+  annotations:
+    # StorageClass parameters are immutable: let Argo CD delete and recreate it
+    # when they change (existing PVs keep working, they copy what they need)
+    argocd.argoproj.io/sync-options: Replace=true
 provisioner: smb.csi.k8s.io
 parameters:
   source: //192.168.129.45/Tristan
@@ -20,6 +25,8 @@ parameters:
   onDelete: retain
   # Credentials: Secret kube-system/nas-smb-credentials (External Secrets,
   # Infisical /nas/SMB_USERNAME + SMB_PASSWORD)
+  csi.storage.k8s.io/provisioner-secret-name: nas-smb-credentials
+  csi.storage.k8s.io/provisioner-secret-namespace: kube-system
   csi.storage.k8s.io/node-stage-secret-name: nas-smb-credentials
   csi.storage.k8s.io/node-stage-secret-namespace: kube-system
 reclaimPolicy: Retain
