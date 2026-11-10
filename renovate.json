@@ -1,0 +1,86 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "dependencyDashboard": true,
+  "platformAutomerge": true,
+  "prHourlyLimit": 0,
+  "argocd": {
+    "managerFilePatterns": [
+      "/^bootstrap/.+\\.ya?ml$/"
+    ]
+  },
+  "helm-values": {
+    "managerFilePatterns": [
+      "/^(apps|infrastructure)/.+/values\\.ya?ml$/"
+    ]
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Tool versions pinned in the CI workflow",
+      "managerFilePatterns": [
+        "/^\\.forgejo/workflows/.+\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "HELM_VERSION: (?<currentValue>v[0-9.]+)"
+      ],
+      "depNameTemplate": "helm/helm",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.forgejo/workflows/.+\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "KUBECONFORM_VERSION: (?<currentValue>v[0-9.]+)"
+      ],
+      "depNameTemplate": "yannh/kubeconform",
+      "datasourceTemplate": "github-releases"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "App images: auto-merge non-major updates once validate is green; the merge deploys them",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest"
+      ],
+      "minimumReleaseAge": "3 days",
+      "minimumReleaseAgeBehaviour": "timestamp-optional",
+      "automerge": true
+    },
+    {
+      "description": "Helm charts (cluster add-ons, app-template): patches auto-merge, minors and majors wait for review",
+      "matchDatasources": [
+        "helm"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "minimumReleaseAge": "3 days",
+      "automerge": true
+    },
+    {
+      "description": "Database major upgrades need a dump/restore: never propose them",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "/postgres/",
+        "/redis/",
+        "/valkey/"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
+    }
+  ]
+}

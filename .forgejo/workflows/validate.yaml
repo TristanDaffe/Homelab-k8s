@@ -1,0 +1,39 @@
+---
+# Renders and validates everything Argo CD deploys (scripts/validate.py).
+# Merging to main deploys, so this check is the gate: main is branch-protected
+# and requires it. No secrets, no cluster access.
+name: validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  HELM_VERSION: v4.3.1
+  KUBECONFORM_VERSION: v0.8.0
+
+jobs:
+  validate:
+    runs-on: docker
+    container:
+      image: node:26-trixie
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install tooling (checksums verified)
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq --no-install-recommends python3-yaml
+          cd /tmp
+          curl -fsSLO "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz"
+          echo "$(curl -fsSL "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz.sha256sum" | cut -d' ' -f1)  helm-${HELM_VERSION}-linux-amd64.tar.gz" | sha256sum -c -
+          tar -xzf "helm-${HELM_VERSION}-linux-amd64.tar.gz" -C /usr/local/bin --strip-components=1 linux-amd64/helm
+          curl -fsSLO "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz"
+          curl -fsSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/CHECKSUMS" | grep ' kubeconform-linux-amd64.tar.gz$' | sha256sum -c -
+          tar -xzf kubeconform-linux-amd64.tar.gz -C /usr/local/bin kubeconform
+          helm version --short && kubeconform -v
+
+      - name: Render and validate
+        run: python3 scripts/validate.py
