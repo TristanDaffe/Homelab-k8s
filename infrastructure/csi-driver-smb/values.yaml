@@ -1,0 +1,4 @@
+# SMB CSI driver (chart csi-driver-smb): mounts the NAS share (WD My Cloud, SMB
+# only) into pods. StorageClasses using it are in infrastructure/nas.
+controller:
+  replicas: 1

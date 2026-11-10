@@ -1,0 +1,28 @@
+# SMB CSI driver for the NAS, see infrastructure/csi-driver-smb
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: csi-driver-smb
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://raw.githubusercontent.com/kubernetes-csi/csi-driver-smb/master/charts
+      chart: csi-driver-smb
+      targetRevision: 1.20.4
+      helm:
+        releaseName: csi-driver-smb
+        valueFiles:
+          - $values/infrastructure/csi-driver-smb/values.yaml
+    - repoURL: ssh://git@git.autostack.ovh:222/Susu/Homelab-k8S.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true

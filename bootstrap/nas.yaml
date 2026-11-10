@@ -1,0 +1,18 @@
+# StorageClasses for the NAS share (SMB), see infrastructure/nas
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nas
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: ssh://git@git.autostack.ovh:222/Susu/Homelab-k8S.git
+    targetRevision: main
+    path: infrastructure/nas
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
