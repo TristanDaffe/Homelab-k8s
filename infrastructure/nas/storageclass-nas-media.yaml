@@ -15,9 +15,10 @@ kind: StorageClass
 metadata:
   name: nas-media
   annotations:
-    # StorageClass parameters are immutable: let Argo CD delete and recreate it
-    # when they change (existing PVs keep working, they copy what they need)
-    argocd.argoproj.io/sync-options: Replace=true
+    # StorageClass parameters are immutable: Force+Replace makes Argo CD delete
+    # and recreate it when they change (Replace alone is still an update and is
+    # rejected). Existing PVs keep working: they copy what they need.
+    argocd.argoproj.io/sync-options: Force=true,Replace=true
 provisioner: smb.csi.k8s.io
 parameters:
   source: //192.168.129.45/Tristan
