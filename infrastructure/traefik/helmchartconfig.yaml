@@ -1,5 +1,5 @@
-# Overrides for the Traefik that k3s installs (HelmChart kube-system/traefik,
-# chart traefik 40.x). Keys: https://github.com/traefik/traefik-helm-chart
+# Overrides for the Traefik that k3s installs (HelmChart kube-system/traefik;
+# k3s v1.37 bundles chart traefik 41.6.x). Keys: https://github.com/traefik/traefik-helm-chart
 apiVersion: helm.cattle.io/v1
 kind: HelmChartConfig
 metadata:
@@ -29,3 +29,20 @@ spec:
     providers:
       kubernetesCRD:
         allowCrossNamespace: true
+
+    # Two replicas on different nodes: the ingress survives a node failure
+    # (the floating IP moves, and a Traefik pod is already running elsewhere)
+    deployment:
+      replicas: 2
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: '{{ template "traefik.name" . }}'
+            app.kubernetes.io/instance: '{{ .Release.Name }}-{{ include "traefik.namespace" . }}'
+    # Node drains (upgrades, reboots) keep at least one Traefik running
+    podDisruptionBudget:
+      enabled: true
+      minAvailable: 1
