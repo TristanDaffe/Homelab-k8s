@@ -9,9 +9,13 @@ spec:
   valuesContent: |-
     # kube-vip gives the LoadBalancer Service the ingress floating IP;
     # *.kube.autostack.ovh points there
+    # Local keeps the client's source IP (Cluster SNATs it to a node address);
+    # kube-vip then announces the IP only from a node running Traefik
     service:
       annotations:
         kube-vip.io/loadbalancerIPs: 192.168.129.139
+      spec:
+        externalTrafficPolicy: Local
 
     # Every plain-HTTP request is redirected to HTTPS (permanent)
     ports:
