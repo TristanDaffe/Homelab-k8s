@@ -24,9 +24,11 @@ controllers:
         resources:
           requests: {cpu: 10m, memory: 128Mi}
           limits: {memory: 384Mi}
+        # TCP: an HTTP probe uses the pod IP as Host, which Homepage's host
+        # validation (HOMEPAGE_ALLOWED_HOSTS) rejects with 400
         probes:
-          liveness: &probe {enabled: true, type: HTTP, path: /api/healthcheck}
-          readiness: *probe
+          liveness: {enabled: true}
+          readiness: {enabled: true}
 
 service:
   app:
