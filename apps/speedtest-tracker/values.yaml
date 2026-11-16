@@ -1,0 +1,74 @@
+# Speedtest Tracker: a speed test every 15 minutes, public dashboard.
+# SQLite history migrated from Master /docker/volumes/speedtest-tracker.
+# APP_KEY must stay the one from Master (Infisical /speedtest-tracker).
+controllers:
+  speedtest-tracker:
+    # 0 until the data is copied in (batch 1 cutover)
+    replicas: 0
+    containers:
+      app:
+        image:
+          repository: ghcr.io/linuxserver/speedtest-tracker
+          tag: 1.15.1
+        env:
+          PUID: "1000"
+          PGID: "1000"
+          DB_CONNECTION: sqlite
+          DISPLAY_TIMEZONE: Europe/Brussels
+          SPEEDTEST_SCHEDULE: "*/15 * * * *"
+          CHART_DATETIME_FORMAT: "j/m G:i"
+          DATETIME_FORMAT: "j M Y, G:i:s"
+          PUBLIC_DASHBOARD: "true"
+        envFrom:
+          - secretRef:
+              name: speedtest-tracker
+        resources:
+          requests: {cpu: 20m, memory: 128Mi}
+          limits: {memory: 512Mi}
+        probes:
+          liveness: {enabled: true}
+          readiness: {enabled: true}
+
+service:
+  app:
+    controller: speedtest-tracker
+    ports:
+      http:
+        port: 80
+
+ingress:
+  app:
+    className: traefik
+    hosts:
+      - host: speedtest.kube.autostack.ovh
+        paths:
+          - path: /
+            pathType: Prefix
+            service:
+              identifier: app
+              port: http
+
+persistence:
+  config:
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 2Gi
+    globalMounts:
+      - path: /config
+
+externalSecrets:
+  app:
+    forceRename: speedtest-tracker
+    secretStoreRef:
+      kind: ClusterSecretStore
+      name: infisical
+    target:
+      name: speedtest-tracker
+    data:
+      - secretKey: APP_KEY
+        remoteRef:
+          key: /speedtest-tracker/APP_KEY
+      - secretKey: SPEEDTEST_SERVER
+        remoteRef:
+          key: /speedtest-tracker/SPEEDTEST_SERVER

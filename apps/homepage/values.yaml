@@ -1,0 +1,590 @@
+# Homepage dashboard. Config files are static copies of the Ansible templates
+# that rendered it on Master; widget credentials come from Infisical /homepage
+# as HOMEPAGE_VAR_* environment variables, which Homepage substitutes into the
+# files ({{HOMEPAGE_VAR_X}}) before parsing them.
+global:
+  # Keep app-template from evaluating Homepage's {{...}} placeholders
+  templateEvaluation:
+    excludePaths:
+      - [configMaps, config, data]
+
+controllers:
+  homepage:
+    containers:
+      app:
+        image:
+          repository: ghcr.io/gethomepage/homepage
+          tag: v2.8.0
+        env:
+          TZ: Europe/Brussels
+          HOMEPAGE_ALLOWED_HOSTS: home.kube.autostack.ovh
+        envFrom:
+          - secretRef:
+              name: homepage-widgets
+        resources:
+          requests: {cpu: 10m, memory: 128Mi}
+          limits: {memory: 384Mi}
+        probes:
+          liveness: &probe {enabled: true, type: HTTP, path: /api/healthcheck}
+          readiness: *probe
+
+service:
+  app:
+    controller: homepage
+    ports:
+      http:
+        port: 3000
+
+ingress:
+  app:
+    className: traefik
+    hosts:
+      - host: home.kube.autostack.ovh
+        paths:
+          - path: /
+            pathType: Prefix
+            service:
+              identifier: app
+              port: http
+
+persistence:
+  # Homepage writes logs and default files into /app/config
+  config-dir:
+    type: emptyDir
+    globalMounts:
+      - path: /app/config
+  config:
+    type: configMap
+    identifier: config
+    globalMounts:
+      - {path: /app/config/settings.yaml, subPath: settings.yaml, readOnly: true}
+      - {path: /app/config/services.yaml, subPath: services.yaml, readOnly: true}
+      - {path: /app/config/bookmarks.yaml, subPath: bookmarks.yaml, readOnly: true}
+      - {path: /app/config/widgets.yaml, subPath: widgets.yaml, readOnly: true}
+
+externalSecrets:
+  widgets:
+    forceRename: homepage-widgets
+    secretStoreRef:
+      kind: ClusterSecretStore
+      name: infisical
+    target:
+      name: homepage-widgets
+    data:
+      - secretKey: HOMEPAGE_VAR_BAZARR_API_KEY
+        remoteRef:
+          key: /homepage/BAZARR_API_KEY
+      - secretKey: HOMEPAGE_VAR_CALIBRE_PASS
+        remoteRef:
+          key: /homepage/CALIBRE_PASS
+      - secretKey: HOMEPAGE_VAR_CALIBRE_USER
+        remoteRef:
+          key: /homepage/CALIBRE_USER
+      - secretKey: HOMEPAGE_VAR_IMMICH_API_KEY
+        remoteRef:
+          key: /homepage/IMMICH_API_KEY
+      - secretKey: HOMEPAGE_VAR_JELLYFIN_API_KEY
+        remoteRef:
+          key: /homepage/JELLYFIN_API_KEY
+      - secretKey: HOMEPAGE_VAR_MEALIE_API_KEY
+        remoteRef:
+          key: /homepage/MEALIE_API_KEY
+      - secretKey: HOMEPAGE_VAR_NPM_PASS
+        remoteRef:
+          key: /homepage/NPM_PASS
+      - secretKey: HOMEPAGE_VAR_NPM_USER
+        remoteRef:
+          key: /homepage/NPM_USER
+      - secretKey: HOMEPAGE_VAR_PAPERLESS_TOKEN
+        remoteRef:
+          key: /homepage/PAPERLESS_TOKEN
+      - secretKey: HOMEPAGE_VAR_PROWLARR_API_KEY
+        remoteRef:
+          key: /homepage/PROWLARR_API_KEY
+      - secretKey: HOMEPAGE_VAR_QBIT_PASS
+        remoteRef:
+          key: /homepage/QBIT_PASS
+      - secretKey: HOMEPAGE_VAR_QBIT_USER
+        remoteRef:
+          key: /homepage/QBIT_USER
+      - secretKey: HOMEPAGE_VAR_RADARR_API_KEY
+        remoteRef:
+          key: /homepage/RADARR_API_KEY
+      - secretKey: HOMEPAGE_VAR_SEERR_API_KEY
+        remoteRef:
+          key: /homepage/SEERR_API_KEY
+      - secretKey: HOMEPAGE_VAR_SONARR_API_KEY
+        remoteRef:
+          key: /homepage/SONARR_API_KEY
+      - secretKey: HOMEPAGE_VAR_SPEEDTEST_API_KEY
+        remoteRef:
+          key: /homepage/SPEEDTEST_API_KEY
+
+configMaps:
+  config:
+    data:
+      settings.yaml: |
+        ---
+        title: My Homelab
+        theme: dark
+        color: slate
+
+        useEqualHeights: true
+        statusStyle: "dot"
+        headerStyle: boxed
+        language: fr
+        hideVersion: true
+        disableCollapse: true
+
+        background:
+          # image: https://images.unsplash.com/photo-1740568439805-b610a1115fc3?q=80&w=3264&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?auto=format&fit=crop&w=2560&q=80
+          image: https://images.unsplash.com/photo-1769863467291-23cf7902f686?q=80&w=1064&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
+          blur: sm
+          saturate: 50
+          brightness: 50
+          opacity: 50
+
+        layout:
+
+          # === MAIN TAB ===
+
+          Home:
+            tab: Main
+            style: row
+            columns: 4
+
+          Media-consumption:
+            tab: Main
+            header: false
+            style: row
+            columns: 2
+            Media:
+              style: row
+              columns: 2
+            Books:
+              style: row
+              columns: 2
+
+          Books:
+            tab: Main
+            header: true
+            style: row
+            columns: 2
+
+          Torrenting:
+            tab: Main
+            header: false
+            style: row
+            columns: 2
+            Media-management:
+              header: true
+              style: row
+              columns: 1
+              Download-management:
+                style: row
+                columns: 2
+                header: false
+              Torrent:
+                style: row
+                columns: 1
+                header: false
+            Calendar:
+              header: true
+              style: row
+              columns: 1
+
+          Tools and stuff:
+            tab: Main
+            header: true
+            style: row
+            columns: 3
+
+          # === ADMIN TAB ===
+
+          Infrastructure:
+            tab: Admin
+            header: true
+            style: row
+            columns: 3
+
+          Monitoring:
+            tab: Admin
+            header: true
+            style: row
+            columns: 3
+
+          DevTools:
+            tab: Admin
+            header: true
+            style: row
+            columns: 4
+
+          Traefik:
+            tab: Admin
+            header: true
+            style: row
+            columns: 3
+
+          Admin-bottom:
+            tab: Admin
+            header: false
+            style: row
+            columns: 2
+            Backup:
+              header: true
+              style: row
+              columns: 2
+            Network:
+              header: true
+              style: row
+              columns: 2
+
+          # === PAPER WORK TAB ===
+
+          Paper-work:
+            tab: Paper work
+            header: true
+            style: row
+            columns: 2
+      services.yaml: |
+        ---
+
+        ################
+        # Main tab
+        ################
+
+        - Home:
+          - Home Assistant:
+              icon: home-assistant.png
+              href: http://ha.home
+              description: Home Assistant
+              ping: http://ha.home
+          - Mealie:
+              icon: mealie.png
+              href: https://meal.autostack.ovh
+              description: Gestion de recettes
+              ping: https://meal.autostack.ovh
+              widget:
+                type: mealie
+                url: https://meal.autostack.ovh
+                key: {{HOMEPAGE_VAR_MEALIE_API_KEY}}
+                version: 2
+          - Immich:
+              icon: immich.png
+              href: https://photo.autostack.ovh
+              description: Gestion de photos
+              ping: https://photo.autostack.ovh
+              widget:
+                type: immich
+                url: https://photo.autostack.ovh
+                key: {{HOMEPAGE_VAR_IMMICH_API_KEY}}
+                version: 2
+
+        - Media-consumption:
+          - Media:
+            - jellyfin:
+                icon: jellyfin.png
+                href: http://jellyflix.home
+                description: Jellyfin
+                ping: http://jellyflix.home
+                widget:
+                  type: jellyfin
+                  url: http://jellyflix.home
+                  key: {{HOMEPAGE_VAR_JELLYFIN_API_KEY}}
+                  version: 2
+                  # enableMediaControl: false
+            - Seer:
+                icon: seerr.png
+                href: https://seer.kube.autostack.ovh
+                description: Demande de films et series
+                ping: http://seerr.seerr.svc.cluster.local:5055
+                widget:
+                  type: seerr
+                  url: http://seerr.seerr.svc.cluster.local:5055
+                  key: {{HOMEPAGE_VAR_SEERR_API_KEY}}
+
+          - Books:
+            - Calibre:
+                icon: calibre.png
+                href: http://calibre.home
+                description: Gestionnaire de livres
+                ping: http://calibre.home
+                widget:
+                  type: calibreweb
+                  url: http://calibre.home
+                  username: {{HOMEPAGE_VAR_CALIBRE_USER}}
+                  password: {{HOMEPAGE_VAR_CALIBRE_PASS}}
+            - Calibre maman:
+                icon: calibre.png
+                href: http://calibre-maman.home
+                description: Gestionnaire de livres
+                ping: http://calibre-maman.home
+                widget:
+                  type: calibreweb
+                  url: http://calibre-maman.home
+                  username: {{HOMEPAGE_VAR_CALIBRE_USER}}
+                  password: {{HOMEPAGE_VAR_CALIBRE_PASS}}
+            - Téléchargement de livres:
+                icon: https://developer.asustor.com/uploadIcons/0020_999_1573465183_calibre-web_256.png
+                href: https://shelfmark.autostack.ovh
+                description: Téléchargement de livres
+                ping: https://shelfmark.autostack.ovh
+            - Téléchargement de livres maman:
+                icon: https://developer.asustor.com/uploadIcons/0020_999_1573465183_calibre-web_256.png
+                href: https://shelfmark-maman.autostack.ovh
+                description: Téléchargement de livres
+                ping: https://shelfmark-maman.autostack.ovh
+
+        - Torrenting:
+          - Media-management:
+            - Download-management:
+              - Radarr:
+                  icon: radarr.png
+                  href: https://arr.autostack.ovh/radarr
+                  description: Téléchargement de films
+                  ping: https://arr.autostack.ovh/radarr
+                  widget:
+                    type: radarr
+                    url: https://arr.autostack.ovh/radarr
+                    key: {{HOMEPAGE_VAR_RADARR_API_KEY}}
+              - Sonarr:
+                  icon: sonarr.png
+                  href: https://arr.autostack.ovh/sonarr
+                  description: Téléchargement de séries
+                  ping: https://arr.autostack.ovh/sonarr
+                  widget:
+                    type: sonarr
+                    url: https://arr.autostack.ovh/sonarr
+                    key: {{HOMEPAGE_VAR_SONARR_API_KEY}}
+              - Bazarr:
+                  icon: bazarr.png
+                  href: https://arr.autostack.ovh/bazarr
+                  description: Téléchargement de sous-titres
+                  ping: https://arr.autostack.ovh/bazarr
+                  widget:
+                    type: bazarr
+                    url: https://arr.autostack.ovh/bazarr
+                    key: {{HOMEPAGE_VAR_BAZARR_API_KEY}}
+              - Prowlarr:
+                  icon: prowlarr.png
+                  href: https://arr.autostack.ovh/prowlarr
+                  description: Gestion des indexeurs
+                  ping: https://arr.autostack.ovh/prowlarr
+                  widget:
+                    type: prowlarr
+                    url: https://arr.autostack.ovh/prowlarr
+                    key: {{HOMEPAGE_VAR_PROWLARR_API_KEY}}
+            - Torrent:
+              - qBittorrent:
+                  icon: qbittorrent.png
+                  href: https://qbit.autostack.ovh
+                  description: Téléchargement de torrents
+                  ping: https://qbit.autostack.ovh
+                  widget:
+                    type: qbittorrent
+                    url: https://qbit.autostack.ovh
+                    username: {{HOMEPAGE_VAR_QBIT_USER}}
+                    password: {{HOMEPAGE_VAR_QBIT_PASS}}
+                    enableLeechProgress: true
+          - Calendar:
+            - Calendar:
+                widget:
+                  type: calendar
+                  view: monthly
+                  maxEvents: 10
+                  showTime: true
+                  timezone: Europe/Brussels
+                  integrations:
+                    - type: sonarr
+                      service_group: Download-management
+                      service_name: Sonarr
+                      color: teal
+                      baseUrl: https://arr.autostack.ovh/sonarr
+                    - type: radarr
+                      service_group: Download-management
+                      service_name: Radarr
+                      color: red
+                      baseUrl: https://arr.autostack.ovh/radarr
+
+        - Tools and stuff:
+          - ItTools:
+              icon: it-tools.png
+              href: https://it.tools.autostack.ovh
+              description: Outils divers pour l'IT
+              ping: https://it.tools.autostack.ovh
+          - Stirling-pdf:
+              icon: stirling-pdf.png
+              href: https://pdf.tools.autostack.ovh
+              description: Outils pour les PDF
+              ping: https://pdf.tools.autostack.ovh
+
+        ################
+        # Admin tab
+        ################
+
+        - Infrastructure:
+          - Proxmox:
+              icon: proxmox.png
+              href: https://192.168.129.110:8006
+              description: Proxmox
+              ping: https://192.168.129.110:8006
+          - Portainer:
+              icon: portainer.png
+              href: https://portainer.autostack.ovh
+              description: Portainer
+              ping: https://portainer.autostack.ovh
+          - Mesh-mini:
+              icon: meshcentral.png
+              href: https://mesh-mini.autostack.ovh
+              description: Mesh-mini
+              ping: https://mesh-mini.autostack.ovh
+          - Pocket-ID:
+              icon: pocket-id.png
+              href: https://pocket-id.autostack.ovh
+              description: Gestion des identités
+              ping: https://pocket-id.autostack.ovh
+
+        - Monitoring:
+          - Grafana:
+              icon: grafana.png
+              href: https://grafana.autostack.ovh
+              description: Dashboards
+              ping: https://grafana.autostack.ovh
+          - Prometheus:
+              icon: prometheus.png
+              href: https://prometheus.autostack.ovh
+              description: Métriques
+              ping: https://prometheus.autostack.ovh
+              widget:
+                type: prometheus
+                url: https://prometheus.autostack.ovh
+
+        # DevTools VM (configure/inventory-dev): not in this inventory, so URLs are static and use devtools_domain
+        - DevTools:
+          - Forgejo:
+              icon: forgejo.png
+              href: https://git.autostack.ovh
+              description: Forge Git
+              ping: https://git.autostack.ovh
+          - CI:
+              icon: mdi-rocket-launch
+              href: https://git.autostack.ovh/Susu/Homelab-infra/actions
+              description: Pipelines Forgejo Actions
+          - Renovate:
+              icon: renovate.png
+              href: https://git.autostack.ovh/Susu/Homelab-infra/issues?q=Dependency+Dashboard
+              description: Mises à jour des dépendances
+          - Infisical:
+              icon: infisical.png
+              href: https://pass.autostack.ovh
+              description: Gestion des secrets
+              ping: https://pass.autostack.ovh
+
+        - Traefik:
+          - Traefik Master:
+              icon: traefik.png
+              href: https://traefik.master.autostack.ovh
+              description: Traefik - master
+              ping: https://traefik.master.autostack.ovh
+              widget:
+                type: traefik
+                url: https://traefik.master.autostack.ovh
+          - Traefik Media:
+              icon: traefik.png
+              href: https://traefik.media.autostack.ovh
+              description: Traefik - media
+              ping: https://traefik.media.autostack.ovh
+              widget:
+                type: traefik
+                url: https://traefik.media.autostack.ovh
+          - Traefik Tools:
+              icon: traefik.png
+              href: https://traefik.tools.autostack.ovh
+              description: Traefik - tools
+              ping: https://traefik.tools.autostack.ovh
+              widget:
+                type: traefik
+                url: https://traefik.tools.autostack.ovh
+          - Traefik Devtools:
+              icon: traefik.png
+              href: https://traefik.devtools.autostack.ovh
+              description: Traefik - devtools
+              ping: https://traefik.devtools.autostack.ovh
+              widget:
+                type: traefik
+                url: https://traefik.devtools.autostack.ovh
+
+        - Admin-bottom:
+          - Backup:
+            - Zerobyte:
+                icon: zerobyte.png
+                href: https://zerobyte.autostack.ovh
+                description: Sauvegardes fichiers
+                ping: https://zerobyte.autostack.ovh
+            - RustFS:
+                icon: rustfs.png
+                href: https://bucket.autostack.ovh
+                description: Stockage objet S3
+                ping: https://bucket.autostack.ovh
+          - Network:
+            - PiHole:
+                icon: pi-hole.svg
+                href: http://pi.home/admin
+                description: Serveur DNS
+                ping: http://pi.home/admin
+            - NPM:
+                icon: nginx-proxy-manager.png
+                href: http://npm.home
+                description: Nginx Proxy Manager
+                ping: http://npm.home
+                widget:
+                  type: npm
+                  url: http://npm.home
+                  username: {{HOMEPAGE_VAR_NPM_USER}}
+                  password: {{HOMEPAGE_VAR_NPM_PASS}}
+            - Speedtest:
+                icon: speedtest-tracker.png
+                href: https://speedtest.kube.autostack.ovh
+                description: Suivi des tests de vitesse
+                ping: http://speedtest-tracker.speedtest-tracker.svc.cluster.local
+                widget:
+                  type: speedtest
+                  url: http://speedtest-tracker.speedtest-tracker.svc.cluster.local
+                  version: 2
+                  key: {{HOMEPAGE_VAR_SPEEDTEST_API_KEY}}
+                  bitratePrecision: 0
+
+        ################
+        # Paper work tab
+        ################
+
+        - Paper-work:
+            - Paperless-ngx:
+                icon: paperless.png
+                href: https://paper.autostack.ovh
+                description: Gestion de documents
+                ping: https://paper.autostack.ovh
+                widget:
+                  type: paperlessngx
+                  url: https://paper.autostack.ovh
+                  key: {{HOMEPAGE_VAR_PAPERLESS_TOKEN}}
+            - actual-budget:
+                icon: actual-budget.png
+                href: https://budget.autostack.ovh
+                description: Gestion de budget
+                ping: http://budget.autostack.ovh
+      bookmarks.yaml: |
+        # https://tinyauth.app/docs/about
+        # https://pocket-id.org/docs
+      widgets.yaml: |
+        ---
+
+        - datetime:
+            text_size: xl
+            format:
+              timeStyle: short
+              hourCycle: h23
+
+        - search:
+            provider: google
+            target: _blank
