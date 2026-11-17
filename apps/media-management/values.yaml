@@ -7,12 +7,10 @@
 # Configs (SQLite) on Longhorn; media on the NAS through one nas-media volume,
 # mounted at the same paths as on Tools.
 # Web UIs: arr.kube.autostack.ovh/<app> and qbit.kube.autostack.ovh behind
-# TinyAuth; the /api paths stay open (Seerr, Homepage, mobile apps use API keys).
+# TinyAuth; the *arr /api paths stay open (they require an API key).
 
 controllers:
   sonarr:
-    # 0 until the config is copied in (batch 2 cutover)
-    replicas: 0
     containers:
       app:
         image:
@@ -31,7 +29,6 @@ controllers:
           readiness: {enabled: true}
 
   radarr:
-    replicas: 0
     containers:
       app:
         image:
@@ -44,7 +41,6 @@ controllers:
         probes: *tcp-probes
 
   prowlarr:
-    replicas: 0
     containers:
       app:
         image:
@@ -57,7 +53,6 @@ controllers:
         probes: *tcp-probes
 
   bazarr:
-    replicas: 0
     containers:
       app:
         image:
@@ -70,7 +65,6 @@ controllers:
         probes: *tcp-probes
 
   qbittorrent:
-    replicas: 0
     containers:
       app:
         image:
@@ -186,6 +180,9 @@ ingress:
       - host: arr.kube.autostack.ovh
         paths:
           - {path: /bazarr/api, pathType: Prefix, service: {identifier: bazarr, port: http}}
+  # No open /api route here: qBittorrent's own login is bypassed for every
+  # address (AuthSubnetWhitelist 0.0.0.0/0), so its API stays behind TinyAuth.
+  # In-cluster clients (Sonarr, Radarr, Homepage) use qbittorrent:8080.
   qbittorrent:
     className: traefik
     annotations: *tinyauth
@@ -193,12 +190,6 @@ ingress:
       - host: qbit.kube.autostack.ovh
         paths:
           - {path: /, pathType: Prefix, service: {identifier: qbittorrent, port: http}}
-  qbittorrent-api:
-    className: traefik
-    hosts:
-      - host: qbit.kube.autostack.ovh
-        paths:
-          - {path: /api, pathType: Prefix, service: {identifier: qbittorrent, port: http}}
 
 persistence:
   sonarr-config:
