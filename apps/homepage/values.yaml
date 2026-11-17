@@ -342,49 +342,49 @@ configMaps:
             - Download-management:
               - Radarr:
                   icon: radarr.png
-                  href: https://arr.autostack.ovh/radarr
+                  href: https://arr.kube.autostack.ovh/radarr
                   description: Téléchargement de films
-                  ping: https://arr.autostack.ovh/radarr
+                  ping: https://arr.kube.autostack.ovh/radarr
                   widget:
                     type: radarr
-                    url: https://arr.autostack.ovh/radarr
+                    url: http://radarr.media-management.svc.cluster.local:7878/radarr
                     key: {{HOMEPAGE_VAR_RADARR_API_KEY}}
               - Sonarr:
                   icon: sonarr.png
-                  href: https://arr.autostack.ovh/sonarr
+                  href: https://arr.kube.autostack.ovh/sonarr
                   description: Téléchargement de séries
-                  ping: https://arr.autostack.ovh/sonarr
+                  ping: https://arr.kube.autostack.ovh/sonarr
                   widget:
                     type: sonarr
-                    url: https://arr.autostack.ovh/sonarr
+                    url: http://sonarr.media-management.svc.cluster.local:8989/sonarr
                     key: {{HOMEPAGE_VAR_SONARR_API_KEY}}
               - Bazarr:
                   icon: bazarr.png
-                  href: https://arr.autostack.ovh/bazarr
+                  href: https://arr.kube.autostack.ovh/bazarr
                   description: Téléchargement de sous-titres
-                  ping: https://arr.autostack.ovh/bazarr
+                  ping: https://arr.kube.autostack.ovh/bazarr
                   widget:
                     type: bazarr
-                    url: https://arr.autostack.ovh/bazarr
+                    url: http://bazarr.media-management.svc.cluster.local:6767/bazarr
                     key: {{HOMEPAGE_VAR_BAZARR_API_KEY}}
               - Prowlarr:
                   icon: prowlarr.png
-                  href: https://arr.autostack.ovh/prowlarr
+                  href: https://arr.kube.autostack.ovh/prowlarr
                   description: Gestion des indexeurs
-                  ping: https://arr.autostack.ovh/prowlarr
+                  ping: https://arr.kube.autostack.ovh/prowlarr
                   widget:
                     type: prowlarr
-                    url: https://arr.autostack.ovh/prowlarr
+                    url: http://prowlarr.media-management.svc.cluster.local:9696/prowlarr
                     key: {{HOMEPAGE_VAR_PROWLARR_API_KEY}}
             - Torrent:
               - qBittorrent:
                   icon: qbittorrent.png
-                  href: https://qbit.autostack.ovh
+                  href: https://qbit.kube.autostack.ovh
                   description: Téléchargement de torrents
-                  ping: https://qbit.autostack.ovh
+                  ping: https://qbit.kube.autostack.ovh
                   widget:
                     type: qbittorrent
-                    url: https://qbit.autostack.ovh
+                    url: http://qbittorrent.media-management.svc.cluster.local:8080
                     username: {{HOMEPAGE_VAR_QBIT_USER}}
                     password: {{HOMEPAGE_VAR_QBIT_PASS}}
                     enableLeechProgress: true
@@ -401,12 +401,12 @@ configMaps:
                       service_group: Download-management
                       service_name: Sonarr
                       color: teal
-                      baseUrl: https://arr.autostack.ovh/sonarr
+                      baseUrl: https://arr.kube.autostack.ovh/sonarr
                     - type: radarr
                       service_group: Download-management
                       service_name: Radarr
                       color: red
-                      baseUrl: https://arr.autostack.ovh/radarr
+                      baseUrl: https://arr.kube.autostack.ovh/radarr
 
         - Tools and stuff:
           - ItTools:
