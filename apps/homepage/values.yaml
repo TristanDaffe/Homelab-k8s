@@ -299,7 +299,7 @@ configMaps:
                 icon: seerr.png
                 href: https://seer.kube.autostack.ovh
                 description: Demande de films et series
-                ping: http://seerr.seerr.svc.cluster.local:5055
+                ping: https://seer.kube.autostack.ovh
                 widget:
                   type: seerr
                   url: http://seerr.seerr.svc.cluster.local:5055
@@ -548,7 +548,7 @@ configMaps:
                 icon: speedtest-tracker.png
                 href: https://speedtest.kube.autostack.ovh
                 description: Suivi des tests de vitesse
-                ping: http://speedtest-tracker.speedtest-tracker.svc.cluster.local
+                ping: https://speedtest.kube.autostack.ovh
                 widget:
                   type: speedtest
                   url: http://speedtest-tracker.speedtest-tracker.svc.cluster.local
