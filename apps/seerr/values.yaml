@@ -3,8 +3,6 @@
 # Data (SQLite + settings.json) migrated from Tools /docker/volumes/seer.
 controllers:
   seerr:
-    # 0 until the data is copied in (batch 1 cutover)
-    replicas: 0
     containers:
       app:
         image:

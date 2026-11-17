@@ -1,10 +1,9 @@
 # Speedtest Tracker: a speed test every 15 minutes, public dashboard.
-# SQLite history migrated from Master /docker/volumes/speedtest-tracker.
-# APP_KEY must stay the one from Master (Infisical /speedtest-tracker).
+# Started with an empty database; the history up to 2026-11-17 is still on
+# Master (/docker/volumes/speedtest-tracker), not migrated yet.
+# APP_KEY is the one from Master (Infisical /speedtest-tracker).
 controllers:
   speedtest-tracker:
-    # 0 until the data is copied in (batch 1 cutover)
-    replicas: 0
     containers:
       app:
         image:
