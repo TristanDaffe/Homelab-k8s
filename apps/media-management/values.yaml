@@ -11,8 +11,6 @@
 
 controllers:
   sonarr:
-    # 0 while the NAS mount is switched to UTF-8 names
-    replicas: 0
     containers:
       app:
         image:
@@ -31,8 +29,6 @@ controllers:
           readiness: {enabled: true}
 
   radarr:
-    # 0 while the NAS mount is switched to UTF-8 names
-    replicas: 0
     containers:
       app:
         image:
@@ -57,8 +53,6 @@ controllers:
         probes: *tcp-probes
 
   bazarr:
-    # 0 while the NAS mount is switched to UTF-8 names
-    replicas: 0
     containers:
       app:
         image:
@@ -71,8 +65,6 @@ controllers:
         probes: *tcp-probes
 
   qbittorrent:
-    # 0 while the NAS mount is switched to UTF-8 names
-    replicas: 0
     containers:
       app:
         image:
