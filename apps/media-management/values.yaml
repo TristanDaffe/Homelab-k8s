@@ -1,0 +1,265 @@
+# Media management stack, migrated from the media-management compose stack on
+# Tools: Sonarr, Radarr, Prowlarr, Bazarr, qBittorrent and a FlareSolverr for
+# Prowlarr (Shelfmark keeps its own FlareSolverr on Tools).
+# One namespace with Services named like the compose services, so the
+# connections saved inside the apps (qbittorrent:8080, prowlarr:9696,
+# sonarr:8989, radarr:7878, flaresolverr:8191) keep working unchanged.
+# Configs (SQLite) on Longhorn; media on the NAS through one nas-media volume,
+# mounted at the same paths as on Tools.
+# Web UIs: arr.kube.autostack.ovh/<app> and qbit.kube.autostack.ovh behind
+# TinyAuth; the /api paths stay open (Seerr, Homepage, mobile apps use API keys).
+
+controllers:
+  sonarr:
+    # 0 until the config is copied in (batch 2 cutover)
+    replicas: 0
+    containers:
+      app:
+        image:
+          repository: ghcr.io/linuxserver/sonarr
+          tag: 4.0.20
+        # Shared by the linuxserver images below
+        env: &lsio-env
+          PUID: "1000"
+          PGID: "1000"
+          TZ: Europe/Brussels
+        resources:
+          requests: {cpu: 50m, memory: 256Mi}
+          limits: {memory: 1Gi}
+        probes: &tcp-probes
+          liveness: {enabled: true}
+          readiness: {enabled: true}
+
+  radarr:
+    replicas: 0
+    containers:
+      app:
+        image:
+          repository: ghcr.io/linuxserver/radarr
+          tag: 7.0.3
+        env: *lsio-env
+        resources:
+          requests: {cpu: 50m, memory: 256Mi}
+          limits: {memory: 1Gi}
+        probes: *tcp-probes
+
+  prowlarr:
+    replicas: 0
+    containers:
+      app:
+        image:
+          repository: ghcr.io/linuxserver/prowlarr
+          tag: 3.0.2
+        env: *lsio-env
+        resources:
+          requests: {cpu: 20m, memory: 128Mi}
+          limits: {memory: 512Mi}
+        probes: *tcp-probes
+
+  bazarr:
+    replicas: 0
+    containers:
+      app:
+        image:
+          repository: ghcr.io/linuxserver/bazarr
+          tag: 1.6.2
+        env: *lsio-env
+        resources:
+          requests: {cpu: 20m, memory: 128Mi}
+          limits: {memory: 512Mi}
+        probes: *tcp-probes
+
+  qbittorrent:
+    replicas: 0
+    containers:
+      app:
+        image:
+          repository: ghcr.io/linuxserver/qbittorrent
+          tag: 20.04.1
+        env:
+          <<: *lsio-env
+          WEBUI_PORT: "8080"
+        resources:
+          requests: {cpu: 50m, memory: 256Mi}
+          limits: {memory: 1Gi}
+        probes: *tcp-probes
+
+  flaresolverr:
+    containers:
+      app:
+        image:
+          repository: ghcr.io/flaresolverr/flaresolverr
+          tag: v3.5.2
+        env:
+          LOG_LEVEL: info
+          TZ: Europe/Brussels
+        resources:
+          requests: {cpu: 20m, memory: 256Mi}
+          limits: {memory: 1Gi}
+        probes: *tcp-probes
+
+service:
+  sonarr:
+    forceRename: sonarr
+    controller: sonarr
+    ports:
+      http: {port: 8989}
+  radarr:
+    forceRename: radarr
+    controller: radarr
+    ports:
+      http: {port: 7878}
+  prowlarr:
+    forceRename: prowlarr
+    controller: prowlarr
+    ports:
+      http: {port: 9696}
+  bazarr:
+    forceRename: bazarr
+    controller: bazarr
+    ports:
+      http: {port: 6767}
+  qbittorrent:
+    forceRename: qbittorrent
+    controller: qbittorrent
+    ports:
+      http: {port: 8080}
+  flaresolverr:
+    forceRename: flaresolverr
+    controller: flaresolverr
+    ports:
+      http: {port: 8191}
+
+# Each web UI behind TinyAuth, plus its /api path without login (the longer
+# path wins in Traefik), as on Tools
+ingress:
+  sonarr:
+    className: traefik
+    annotations: &tinyauth
+      traefik.ingress.kubernetes.io/router.middlewares: tinyauth-media-forwardauth@kubernetescrd
+    hosts:
+      - host: arr.kube.autostack.ovh
+        paths:
+          - {path: /sonarr, pathType: Prefix, service: {identifier: sonarr, port: http}}
+  sonarr-api:
+    className: traefik
+    hosts:
+      - host: arr.kube.autostack.ovh
+        paths:
+          - {path: /sonarr/api, pathType: Prefix, service: {identifier: sonarr, port: http}}
+  radarr:
+    className: traefik
+    annotations: *tinyauth
+    hosts:
+      - host: arr.kube.autostack.ovh
+        paths:
+          - {path: /radarr, pathType: Prefix, service: {identifier: radarr, port: http}}
+  radarr-api:
+    className: traefik
+    hosts:
+      - host: arr.kube.autostack.ovh
+        paths:
+          - {path: /radarr/api, pathType: Prefix, service: {identifier: radarr, port: http}}
+  prowlarr:
+    className: traefik
+    annotations: *tinyauth
+    hosts:
+      - host: arr.kube.autostack.ovh
+        paths:
+          - {path: /prowlarr, pathType: Prefix, service: {identifier: prowlarr, port: http}}
+  prowlarr-api:
+    className: traefik
+    hosts:
+      - host: arr.kube.autostack.ovh
+        paths:
+          - {path: /prowlarr/api, pathType: Prefix, service: {identifier: prowlarr, port: http}}
+  bazarr:
+    className: traefik
+    annotations: *tinyauth
+    hosts:
+      - host: arr.kube.autostack.ovh
+        paths:
+          - {path: /bazarr, pathType: Prefix, service: {identifier: bazarr, port: http}}
+  bazarr-api:
+    className: traefik
+    hosts:
+      - host: arr.kube.autostack.ovh
+        paths:
+          - {path: /bazarr/api, pathType: Prefix, service: {identifier: bazarr, port: http}}
+  qbittorrent:
+    className: traefik
+    annotations: *tinyauth
+    hosts:
+      - host: qbit.kube.autostack.ovh
+        paths:
+          - {path: /, pathType: Prefix, service: {identifier: qbittorrent, port: http}}
+  qbittorrent-api:
+    className: traefik
+    hosts:
+      - host: qbit.kube.autostack.ovh
+        paths:
+          - {path: /api, pathType: Prefix, service: {identifier: qbittorrent, port: http}}
+
+persistence:
+  sonarr-config:
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 2Gi
+    advancedMounts:
+      sonarr:
+        app: [{path: /config}]
+  radarr-config:
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 2Gi
+    advancedMounts:
+      radarr:
+        app: [{path: /config}]
+  prowlarr-config:
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    advancedMounts:
+      prowlarr:
+        app: [{path: /config}]
+  bazarr-config:
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    advancedMounts:
+      bazarr:
+        app: [{path: /config}]
+  qbittorrent-config:
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    advancedMounts:
+      qbittorrent:
+        app: [{path: /config}]
+  # NAS folder mac-mini (same as Tools' /media); same container paths as Tools
+  media:
+    type: persistentVolumeClaim
+    storageClass: nas-media
+    accessMode: ReadWriteMany
+    size: 1Ti
+    advancedMounts:
+      sonarr:
+        app:
+          - {path: /downloads, subPath: media/downloads}
+          - {path: /tv, subPath: media/tvseries}
+      radarr:
+        app:
+          - {path: /downloads, subPath: media/downloads}
+          - {path: /movies, subPath: media/movies}
+      bazarr:
+        app:
+          - {path: /movies, subPath: media/movies}
+          - {path: /tv, subPath: media/tvseries}
+      qbittorrent:
+        app:
+          - {path: /downloads, subPath: media/downloads}
