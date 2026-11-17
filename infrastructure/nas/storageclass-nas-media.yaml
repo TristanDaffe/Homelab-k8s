@@ -43,3 +43,6 @@ mountOptions:
   - dir_mode=0775
   - nobrl
   - noperm
+  # File names in UTF-8: the k3s nodes' kernel defaults to iso8859-1 (the
+  # Proxmox kernel to utf8), which garbles accented names (é → 0xE9)
+  - iocharset=utf8
