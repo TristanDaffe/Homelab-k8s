@@ -64,6 +64,10 @@ test:
 ingress:
   enabled: true
   ingressClassName: traefik
+  # Only the prod Docker hosts may push (Traefik sees real client IPs since
+  # externalTrafficPolicy: Local)
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: monitoring-loki-push-allowlist@kubernetescrd
   hosts:
     - loki.kube.autostack.ovh
   paths:
@@ -73,3 +77,16 @@ ingress:
     ruler: []
     # The compactor group would expose the delete API
     compactor: []
+
+extraObjects:
+  - apiVersion: traefik.io/v1alpha1
+    kind: Middleware
+    metadata:
+      name: loki-push-allowlist
+    spec:
+      ipAllowList:
+        # Media, Tools, Master
+        sourceRange:
+          - 192.168.129.123/32
+          - 192.168.129.124/32
+          - 192.168.129.125/32
