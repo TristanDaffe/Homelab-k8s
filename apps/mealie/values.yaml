@@ -4,8 +4,6 @@
 # Login through Pocket ID (OIDC client in Infisical /mealie).
 controllers:
   mealie:
-    # 0 until the data is migrated (batch 3 cutover)
-    replicas: 0
     containers:
       app:
         image:

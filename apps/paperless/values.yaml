@@ -7,8 +7,6 @@
 # Login through Pocket ID (allauth; OIDC client in Infisical /paperless).
 controllers:
   paperless:
-    # 0 until the data is migrated (batch 3 cutover)
-    replicas: 0
     containers:
       app:
         image:

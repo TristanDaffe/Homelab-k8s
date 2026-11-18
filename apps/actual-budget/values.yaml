@@ -3,8 +3,6 @@
 # Infisical /actual-budget).
 controllers:
   actual-budget:
-    # 0 until the data is migrated (batch 3 cutover)
-    replicas: 0
     containers:
       app:
         image:
