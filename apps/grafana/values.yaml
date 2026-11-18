@@ -1,0 +1,108 @@
+# Grafana, migrated from Master's monitoring stack (/var/lib/grafana: users,
+# alert rule, plugins). Login through Pocket ID (OIDC client in Infisical
+# /grafana). Its data sources are provisioned from this file with their
+# original names and UIDs (the alert rule references the Prometheus UID);
+# they point at Prometheus and Loki on Master until the monitoring batch.
+controllers:
+  grafana:
+    # 0 until the data is migrated (Grafana cutover)
+    replicas: 0
+    containers:
+      app:
+        image:
+          repository: grafana/grafana
+          tag: 13.3.1
+        env:
+          GF_SERVER_ROOT_URL: https://grafana.kube.autostack.ovh
+          GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
+          GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP: "true"
+          GF_AUTH_GENERIC_OAUTH_SKIP_ORG_ROLE_SYNC: "true"
+          GF_AUTH_GENERIC_OAUTH_NAME: Pocket-ID
+          GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "false"
+          GF_AUTH_GENERIC_OAUTH_SCOPES: openid profile email
+          GF_AUTH_GENERIC_OAUTH_AUTH_URL: https://pocket-id.autostack.ovh/authorize
+          GF_AUTH_GENERIC_OAUTH_TOKEN_URL: https://pocket-id.autostack.ovh/api/oidc/token
+          GF_AUTH_GENERIC_OAUTH_API_URL: https://pocket-id.autostack.ovh/api/oidc/userinfo
+        envFrom:
+          - secretRef:
+              name: grafana
+        resources:
+          requests: {cpu: 20m, memory: 128Mi}
+          limits: {memory: 512Mi}
+        probes:
+          liveness: &probe {enabled: true, type: HTTP, path: /api/health}
+          readiness: *probe
+
+defaultPodOptions:
+  # The image runs as grafana (472); the data on Master is owned by 472
+  securityContext:
+    fsGroup: 472
+    fsGroupChangePolicy: OnRootMismatch
+
+service:
+  app:
+    controller: grafana
+    ports:
+      http:
+        port: 3000
+
+ingress:
+  app:
+    className: traefik
+    hosts:
+      - host: grafana.kube.autostack.ovh
+        paths:
+          - path: /
+            pathType: Prefix
+            service:
+              identifier: app
+              port: http
+
+persistence:
+  data:
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 2Gi
+    globalMounts:
+      - path: /var/lib/grafana
+  datasources:
+    type: configMap
+    identifier: datasources
+    globalMounts:
+      - path: /etc/grafana/provisioning/datasources
+        readOnly: true
+
+configMaps:
+  datasources:
+    data:
+      datasources.yaml: |
+        apiVersion: 1
+        datasources:
+          - name: prometheus
+            uid: cfgafd3vpcpa8c
+            type: prometheus
+            access: proxy
+            url: https://prometheus.autostack.ovh
+            isDefault: true
+          - name: loki
+            uid: dfgafeumjj5z4c
+            type: loki
+            access: proxy
+            url: https://loki.autostack.ovh
+
+externalSecrets:
+  app:
+    forceRename: grafana
+    secretStoreRef:
+      kind: ClusterSecretStore
+      name: infisical
+    target:
+      name: grafana
+    data:
+      - secretKey: GF_AUTH_GENERIC_OAUTH_CLIENT_ID
+        remoteRef:
+          key: /grafana/GF_AUTH_GENERIC_OAUTH_CLIENT_ID
+      - secretKey: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+        remoteRef:
+          key: /grafana/GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
