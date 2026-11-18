@@ -263,12 +263,12 @@ configMaps:
               ping: http://ha.home
           - Mealie:
               icon: mealie.png
-              href: https://meal.autostack.ovh
+              href: https://meal.kube.autostack.ovh
               description: Gestion de recettes
-              ping: https://meal.autostack.ovh
+              ping: https://meal.kube.autostack.ovh
               widget:
                 type: mealie
-                url: https://meal.autostack.ovh
+                url: http://mealie.mealie.svc.cluster.local:9000
                 key: {{HOMEPAGE_VAR_MEALIE_API_KEY}}
                 version: 2
           - Immich:
@@ -563,18 +563,18 @@ configMaps:
         - Paper-work:
             - Paperless-ngx:
                 icon: paperless.png
-                href: https://paper.autostack.ovh
+                href: https://paper.kube.autostack.ovh
                 description: Gestion de documents
-                ping: https://paper.autostack.ovh
+                ping: https://paper.kube.autostack.ovh
                 widget:
                   type: paperlessngx
-                  url: https://paper.autostack.ovh
+                  url: http://paperless.paperless.svc.cluster.local:8000
                   key: {{HOMEPAGE_VAR_PAPERLESS_TOKEN}}
             - actual-budget:
                 icon: actual-budget.png
-                href: https://budget.autostack.ovh
+                href: https://budget.kube.autostack.ovh
                 description: Gestion de budget
-                ping: http://budget.autostack.ovh
+                ping: https://budget.kube.autostack.ovh
       bookmarks.yaml: |
         # https://tinyauth.app/docs/about
         # https://pocket-id.org/docs
