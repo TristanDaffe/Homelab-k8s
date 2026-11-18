@@ -5,8 +5,6 @@
 # they point at Prometheus and Loki on Master until the monitoring batch.
 controllers:
   grafana:
-    # 0 until the data is migrated (Grafana cutover)
-    replicas: 0
     containers:
       app:
         image:

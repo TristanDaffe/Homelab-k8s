@@ -449,9 +449,9 @@ configMaps:
         - Monitoring:
           - Grafana:
               icon: grafana.png
-              href: https://grafana.autostack.ovh
+              href: https://grafana.kube.autostack.ovh
               description: Dashboards
-              ping: https://grafana.autostack.ovh
+              ping: https://grafana.kube.autostack.ovh
           - Prometheus:
               icon: prometheus.png
               href: https://prometheus.autostack.ovh
