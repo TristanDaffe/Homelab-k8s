@@ -1,0 +1,91 @@
+# Mealie (recipes). Database on the Postgres HA cluster (floating IP .140,
+# database/user mealie, created by the Homelab-infra postgresql-ha role).
+# Files (/app/data) migrated from Media /docker/volumes/mealie/data.
+# Login through Pocket ID (OIDC client in Infisical /mealie).
+controllers:
+  mealie:
+    # 0 until the data is migrated (batch 3 cutover)
+    replicas: 0
+    containers:
+      app:
+        image:
+          repository: ghcr.io/mealie-recipes/mealie
+          tag: v3.31.0
+        env:
+          PUID: "1000"
+          PGID: "1000"
+          TZ: Europe/Brussels
+          BASE_URL: https://meal.kube.autostack.ovh
+          ALLOW_SIGNUP: "false"
+          DB_ENGINE: postgres
+          POSTGRES_SERVER: 192.168.129.140
+          POSTGRES_PORT: "5432"
+          POSTGRES_DB: mealie
+          POSTGRES_USER: mealie
+          OIDC_AUTH_ENABLED: "true"
+          OIDC_SIGNUP_ENABLED: "true"
+          OIDC_PROVIDER_NAME: Pocket ID
+          OIDC_CONFIGURATION_URL: https://pocket-id.autostack.ovh/.well-known/openid-configuration
+          OIDC_AUTO_REDIRECT: "true"
+          OIDC_REQUIRES_EMAIL_VERIFICATION: "false"
+          ALLOW_PASSWORD_LOGIN: "false"
+        envFrom:
+          - secretRef:
+              name: mealie
+        resources:
+          requests: {cpu: 20m, memory: 256Mi}
+          limits: {memory: 1Gi}
+        probes:
+          liveness: {enabled: true}
+          readiness: {enabled: true}
+          # First start after the migration may run database migrations
+          startup:
+            enabled: true
+            spec: {failureThreshold: 30, periodSeconds: 10}
+
+service:
+  app:
+    controller: mealie
+    ports:
+      http:
+        port: 9000
+
+ingress:
+  app:
+    className: traefik
+    hosts:
+      - host: meal.kube.autostack.ovh
+        paths:
+          - path: /
+            pathType: Prefix
+            service:
+              identifier: app
+              port: http
+
+persistence:
+  data:
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    globalMounts:
+      - path: /app/data
+
+externalSecrets:
+  app:
+    forceRename: mealie
+    secretStoreRef:
+      kind: ClusterSecretStore
+      name: infisical
+    target:
+      name: mealie
+    data:
+      - secretKey: POSTGRES_PASSWORD
+        remoteRef:
+          key: /mealie/POSTGRES_PASSWORD
+      - secretKey: OIDC_CLIENT_ID
+        remoteRef:
+          key: /mealie/OIDC_CLIENT_ID
+      - secretKey: OIDC_CLIENT_SECRET
+        remoteRef:
+          key: /mealie/OIDC_CLIENT_SECRET
