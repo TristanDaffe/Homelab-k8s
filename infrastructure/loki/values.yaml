@@ -1,0 +1,75 @@
+# Loki (chart grafana/loki) as a single binary with filesystem storage on
+# longhorn-single, 14 days of retention. Grafana and the in-cluster Alloy use
+# the Service (loki.monitoring:3100). The ingress only exposes the push path,
+# for Alloy on the prod Docker hosts (outside k3s); queries stay in-cluster.
+deploymentMode: SingleBinary
+
+loki:
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 1
+  storage:
+    type: filesystem
+  schemaConfig:
+    configs:
+      - from: "2026-01-01"
+        store: tsdb
+        object_store: filesystem
+        schema: v13
+        index:
+          prefix: index_
+          period: 24h
+  limits_config:
+    retention_period: 336h
+    # Needed by the pattern ingester's aggregated metrics (Logs Drilldown);
+    # Master's Loki rejected its own writes with this off
+    allow_structured_metadata: true
+    volume_enabled: true
+  compactor:
+    retention_enabled: true
+    delete_request_store: filesystem
+  pattern_ingester:
+    enabled: true
+
+singleBinary:
+  replicas: 1
+  persistence:
+    enabled: true
+    storageClass: longhorn-single
+    size: 10Gi
+  resources:
+    requests: {cpu: 50m, memory: 256Mi}
+    limits: {memory: 1Gi}
+
+# Single binary only: no scalable targets, caches, object store or canaries
+read:
+  replicas: 0
+write:
+  replicas: 0
+backend:
+  replicas: 0
+chunksCache:
+  enabled: false
+resultsCache:
+  enabled: false
+minio:
+  enabled: false
+gateway:
+  enabled: false
+lokiCanary:
+  enabled: false
+test:
+  enabled: false
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  hosts:
+    - loki.kube.autostack.ovh
+  paths:
+    distributor:
+      - /loki/api/v1/push
+    queryFrontend: []
+    ruler: []
+    # The compactor group would expose the delete API
+    compactor: []

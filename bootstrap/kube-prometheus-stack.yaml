@@ -1,0 +1,31 @@
+# Prometheus (operator, node-exporter on the k3s nodes, kube-state-metrics);
+# also scrapes the prod Docker hosts' node_exporter. See infrastructure/kube-prometheus-stack
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: 93.4.0
+      helm:
+        releaseName: kube-prometheus-stack
+        valueFiles:
+          - $values/infrastructure/kube-prometheus-stack/values.yaml
+    - repoURL: ssh://git@git.autostack.ovh:222/Susu/Homelab-k8S.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      # The operator's CRDs are too large for client-side apply
+      - ServerSideApply=true

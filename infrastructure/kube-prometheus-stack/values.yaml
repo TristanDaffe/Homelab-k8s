@@ -1,0 +1,72 @@
+# kube-prometheus-stack (chart prometheus-community/kube-prometheus-stack):
+# Prometheus + operator, node-exporter on the k3s nodes, kube-state-metrics.
+# Grafana runs as its own app (apps/grafana) and does the alerting, so the
+# chart's Grafana and Alertmanager are off. k3s runs the controller-manager,
+# scheduler, proxy and etcd inside the k3s process (not scrapeable as
+# separate components): those monitors and their rules are off too.
+
+alertmanager:
+  enabled: false
+grafana:
+  enabled: false
+
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeEtcd:
+  enabled: false
+
+defaultRules:
+  rules:
+    alertmanager: false
+    etcd: false
+    kubeControllerManager: false
+    kubeSchedulerAlerting: false
+    kubeSchedulerRecording: false
+    kubeProxy: false
+
+prometheus:
+  # UI at prometheus.kube.autostack.ovh, behind TinyAuth (Prometheus has no login)
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    annotations:
+      traefik.ingress.kubernetes.io/router.middlewares: tinyauth-media-forwardauth@kubernetescrd
+    hosts:
+      - prometheus.kube.autostack.ovh
+    paths:
+      - /
+  prometheusSpec:
+    retention: 15d
+    retentionSize: 9GB
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn-single
+          accessModes: [ReadWriteOnce]
+          resources:
+            requests:
+              storage: 10Gi
+    # Pick up ServiceMonitors/PodMonitors/rules from every namespace, not only
+    # the ones labelled for this release
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    resources:
+      requests: {cpu: 100m, memory: 512Mi}
+      limits: {memory: 2Gi}
+    # The prod Docker hosts (outside k3s), by LAN address. Same job name and
+    # `node` labels as Master's Prometheus had (Grafana's disk alert uses
+    # node_uname_info's nodename, not these labels).
+    additionalScrapeConfigs:
+      - job_name: node_exporter
+        static_configs:
+          - targets: ['192.168.129.125:9100']
+            labels: {node: master}
+          - targets: ['192.168.129.124:9100']
+            labels: {node: tools}
+          - targets: ['192.168.129.123:9100']
+            labels: {node: media}

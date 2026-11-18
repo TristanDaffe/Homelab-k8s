@@ -1,0 +1,30 @@
+# Loki (single binary): logs from the k3s pods (Alloy DaemonSet) and from the
+# prod Docker hosts (their Alloy, through the ingress). See infrastructure/loki
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://grafana.github.io/helm-charts
+      chart: loki
+      targetRevision: 7.6.0
+      helm:
+        releaseName: loki
+        valueFiles:
+          - $values/infrastructure/loki/values.yaml
+    - repoURL: ssh://git@git.autostack.ovh:222/Susu/Homelab-k8S.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
