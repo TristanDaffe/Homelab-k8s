@@ -454,12 +454,12 @@ configMaps:
               ping: https://grafana.kube.autostack.ovh
           - Prometheus:
               icon: prometheus.png
-              href: https://prometheus.autostack.ovh
+              href: https://prometheus.kube.autostack.ovh
               description: Métriques
-              ping: https://prometheus.autostack.ovh
+              ping: https://prometheus.kube.autostack.ovh
               widget:
                 type: prometheus
-                url: https://prometheus.autostack.ovh
+                url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
 
         # DevTools VM (configure/inventory-dev): not in this inventory, so URLs are static and use devtools_domain
         - DevTools:

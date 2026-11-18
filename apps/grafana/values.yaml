@@ -2,7 +2,7 @@
 # alert rule, plugins). Login through Pocket ID (OIDC client in Infisical
 # /grafana). Its data sources are provisioned from this file with their
 # original names and UIDs (the alert rule references the Prometheus UID);
-# they point at Prometheus and Loki on Master until the monitoring batch.
+# they point at the in-cluster Prometheus and Loki (namespace monitoring).
 controllers:
   grafana:
     containers:
@@ -81,13 +81,13 @@ configMaps:
             uid: cfgafd3vpcpa8c
             type: prometheus
             access: proxy
-            url: https://prometheus.autostack.ovh
+            url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
             isDefault: true
           - name: loki
             uid: dfgafeumjj5z4c
             type: loki
             access: proxy
-            url: https://loki.autostack.ovh
+            url: http://loki.monitoring.svc.cluster.local:3100
 
 externalSecrets:
   app:
