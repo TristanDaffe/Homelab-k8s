@@ -1,6 +1,6 @@
 # Media management stack, migrated from the media-management compose stack on
 # Tools: Sonarr, Radarr, Prowlarr, Bazarr, qBittorrent and a FlareSolverr for
-# Prowlarr (Shelfmark keeps its own FlareSolverr on Tools).
+# Prowlarr and Shelfmark, plus Shelfmark x2 (book downloads).
 # One namespace with Services named like the compose services, so the
 # connections saved inside the apps (qbittorrent:8080, prowlarr:9696,
 # sonarr:8989, radarr:7878, flaresolverr:8191) keep working unchanged.
@@ -92,6 +92,58 @@ controllers:
           limits: {memory: 1Gi}
         probes: *tcp-probes
 
+  # Shelfmark (book downloads into the NAS books folders, picked up by
+  # Calibre-Web on Media); the first one uses FlareSolverr as on Tools
+  shelfmark:
+    # 0 until the config is copied in (final app batch)
+    replicas: 0
+    containers:
+      app:
+        image:
+          repository: ghcr.io/calibrain/shelfmark
+          tag: v1.7.0
+        env:
+          FLASK_PORT: "8084"
+          LOG_LEVEL: info
+          USE_BOOK_TITLE: "true"
+          TZ: Europe/Brussels
+          APP_ENV: prod
+          UID: "1000"
+          GID: "1000"
+          CUSTOM_DNS: google
+          USE_DOH: "true"
+          BOOK_LANGUAGE: fr,en
+          USE_CF_BYPASS: "true"
+          EXT_BYPASSER_URL: http://flaresolverr:8191
+          PRIORITIZE_WELIB: "True"
+        resources:
+          requests: {cpu: 20m, memory: 128Mi}
+          limits: {memory: 512Mi}
+        probes: *tcp-probes
+
+  shelfmark-maman:
+    replicas: 0
+    containers:
+      app:
+        image:
+          repository: ghcr.io/calibrain/shelfmark
+          tag: v1.7.0
+        env:
+          FLASK_PORT: "8084"
+          LOG_LEVEL: info
+          USE_BOOK_TITLE: "true"
+          TZ: Europe/Brussels
+          APP_ENV: prod
+          UID: "1000"
+          GID: "1000"
+          CUSTOM_DNS: google
+          USE_DOH: "true"
+          BOOK_LANGUAGE: fr
+        resources:
+          requests: {cpu: 20m, memory: 128Mi}
+          limits: {memory: 512Mi}
+        probes: *tcp-probes
+
 service:
   sonarr:
     forceRename: sonarr
@@ -118,6 +170,16 @@ service:
     controller: qbittorrent
     ports:
       http: {port: 8080}
+  shelfmark:
+    forceRename: shelfmark
+    controller: shelfmark
+    ports:
+      http: {port: 8084}
+  shelfmark-maman:
+    forceRename: shelfmark-maman
+    controller: shelfmark-maman
+    ports:
+      http: {port: 8084}
   flaresolverr:
     forceRename: flaresolverr
     controller: flaresolverr
@@ -190,6 +252,19 @@ ingress:
       - host: qbit.kube.autostack.ovh
         paths:
           - {path: /, pathType: Prefix, service: {identifier: qbittorrent, port: http}}
+  # No login, as on Tools
+  shelfmark:
+    className: traefik
+    hosts:
+      - host: shelfmark.kube.autostack.ovh
+        paths:
+          - {path: /, pathType: Prefix, service: {identifier: shelfmark, port: http}}
+  shelfmark-maman:
+    className: traefik
+    hosts:
+      - host: shelfmark-maman.kube.autostack.ovh
+        paths:
+          - {path: /, pathType: Prefix, service: {identifier: shelfmark-maman, port: http}}
 
 persistence:
   sonarr-config:
@@ -232,6 +307,22 @@ persistence:
     advancedMounts:
       qbittorrent:
         app: [{path: /config}]
+  shelfmark-config:
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    advancedMounts:
+      shelfmark:
+        app: [{path: /config}]
+  shelfmark-maman-config:
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    advancedMounts:
+      shelfmark-maman:
+        app: [{path: /config}]
   # NAS folder mac-mini (same as Tools' /media); same container paths as Tools
   media:
     type: persistentVolumeClaim
@@ -254,3 +345,9 @@ persistence:
       qbittorrent:
         app:
           - {path: /downloads, subPath: media/downloads}
+      shelfmark:
+        app:
+          - {path: /books, subPath: books/downloads}
+      shelfmark-maman:
+        app:
+          - {path: /books, subPath: books-maman/downloads}
