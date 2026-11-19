@@ -58,7 +58,7 @@ prometheus:
     resources:
       requests: {cpu: 100m, memory: 512Mi}
       limits: {memory: 2Gi}
-    # The prod Docker hosts (outside k3s), by LAN address. Same job name and
+    # The hosts outside k3s (prod Docker hosts, DevTools, Postgres HA), by LAN address. Same job name and
     # `node` labels as Master's Prometheus had (Grafana's disk alert uses
     # node_uname_info's nodename, not these labels).
     additionalScrapeConfigs:
@@ -70,3 +70,20 @@ prometheus:
             labels: {node: tools}
           - targets: ['192.168.129.123:9100']
             labels: {node: media}
+          - targets: ['192.168.129.129:9100']
+            labels: {node: devtools}
+          - targets: ['192.168.129.133:9100']
+            labels: {node: postgres-pve}
+          - targets: ['192.168.129.134:9100']
+            labels: {node: postgres-pve-dev}
+          - targets: ['192.168.129.135:9100']
+            labels: {node: postgres-pve-dev-2}
+      # Patroni's built-in metrics on the Postgres HA members (role, lag, timeline)
+      - job_name: patroni
+        static_configs:
+          - targets: ['192.168.129.133:8008']
+            labels: {node: postgres-pve}
+          - targets: ['192.168.129.134:8008']
+            labels: {node: postgres-pve-dev}
+          - targets: ['192.168.129.135:8008']
+            labels: {node: postgres-pve-dev-2}
