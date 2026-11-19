@@ -90,5 +90,5 @@ rawResources:
         dnsNames: [pocket-id.autostack.ovh]
         issuerRef:
           kind: ClusterIssuer
-          # Staging first (project rule), then letsencrypt-prod
-          name: letsencrypt-staging
+          # Tested on letsencrypt-staging first (project rule)
+          name: letsencrypt-prod
