@@ -11,8 +11,9 @@ spec:
   dnsNames:
     - "*.autostack.ovh"
     - "*.tools.autostack.ovh"
+    # kube.autostack.ovh itself is covered by *.autostack.ovh (listing it is
+    # rejected as redundant)
     - "*.kube.autostack.ovh"
-    - kube.autostack.ovh
   issuerRef:
     kind: ClusterIssuer
     # Staging first (project rule), then letsencrypt-prod
