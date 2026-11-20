@@ -6,8 +6,6 @@
 # zone's wildcard points at Master). TLS: its own Let's Encrypt certificate.
 controllers:
   pocket-id:
-    # 0 until the data is copied in (final app batch)
-    replicas: 0
     containers:
       app:
         image:
