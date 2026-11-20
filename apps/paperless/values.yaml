@@ -64,7 +64,7 @@ controllers:
       app:
         image:
           repository: docker.io/gotenberg/gotenberg
-          tag: "9.5"
+          tag: "9.6"
         # No JavaScript or external content when converting .eml files
         args:
           - gotenberg
