@@ -69,6 +69,8 @@ ingress:
   annotations:
     traefik.ingress.kubernetes.io/router.middlewares: monitoring-loki-push-allowlist@kubernetescrd
   hosts:
+    - loki.autostack.ovh
+    # Until Alloy on the hosts pushes to loki.autostack.ovh
     - loki.kube.autostack.ovh
   paths:
     distributor:

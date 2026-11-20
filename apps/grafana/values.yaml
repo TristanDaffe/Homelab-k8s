@@ -11,7 +11,7 @@ controllers:
           repository: grafana/grafana
           tag: 13.3.1
         env:
-          GF_SERVER_ROOT_URL: https://grafana.kube.autostack.ovh
+          GF_SERVER_ROOT_URL: https://grafana.autostack.ovh
           GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
           GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP: "true"
           GF_AUTH_GENERIC_OAUTH_SKIP_ORG_ROLE_SYNC: "true"
@@ -48,7 +48,7 @@ ingress:
   app:
     className: traefik
     hosts:
-      - host: grafana.kube.autostack.ovh
+      - host: grafana.autostack.ovh
         paths:
           - path: /
             pathType: Prefix

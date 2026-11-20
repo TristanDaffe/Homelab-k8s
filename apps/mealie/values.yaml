@@ -13,7 +13,7 @@ controllers:
           PUID: "1000"
           PGID: "1000"
           TZ: Europe/Brussels
-          BASE_URL: https://meal.kube.autostack.ovh
+          BASE_URL: https://meal.autostack.ovh
           ALLOW_SIGNUP: "false"
           DB_ENGINE: postgres
           POSTGRES_SERVER: 192.168.129.140
@@ -52,7 +52,7 @@ ingress:
   app:
     className: traefik
     hosts:
-      - host: meal.kube.autostack.ovh
+      - host: meal.autostack.ovh
         paths:
           - path: /
             pathType: Prefix

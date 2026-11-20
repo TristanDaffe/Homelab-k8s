@@ -7,4 +7,4 @@ metadata:
   namespace: kube-system
 spec:
   defaultCertificate:
-    secretName: wildcard-kube-autostack-ovh-tls
+    secretName: wildcard-autostack-ovh-tls

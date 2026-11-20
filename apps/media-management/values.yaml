@@ -6,7 +6,7 @@
 # sonarr:8989, radarr:7878, flaresolverr:8191) keep working unchanged.
 # Configs (SQLite) on Longhorn; media on the NAS through one nas-media volume,
 # mounted at the same paths as on Tools.
-# Web UIs: arr.kube.autostack.ovh/<app> and qbit.kube.autostack.ovh behind
+# Web UIs: arr.autostack.ovh/<app> and qbit.autostack.ovh behind
 # TinyAuth; the *arr /api paths stay open (they require an API key).
 
 controllers:
@@ -203,52 +203,52 @@ ingress:
     annotations: &tinyauth
       traefik.ingress.kubernetes.io/router.middlewares: tinyauth-media-forwardauth@kubernetescrd
     hosts:
-      - host: arr.kube.autostack.ovh
+      - host: arr.autostack.ovh
         paths:
           - {path: /sonarr, pathType: Prefix, service: {identifier: sonarr, port: http}}
   sonarr-api:
     className: traefik
     hosts:
-      - host: arr.kube.autostack.ovh
+      - host: arr.autostack.ovh
         paths:
           - {path: /sonarr/api, pathType: Prefix, service: {identifier: sonarr, port: http}}
   radarr:
     className: traefik
     annotations: *tinyauth
     hosts:
-      - host: arr.kube.autostack.ovh
+      - host: arr.autostack.ovh
         paths:
           - {path: /radarr, pathType: Prefix, service: {identifier: radarr, port: http}}
   radarr-api:
     className: traefik
     hosts:
-      - host: arr.kube.autostack.ovh
+      - host: arr.autostack.ovh
         paths:
           - {path: /radarr/api, pathType: Prefix, service: {identifier: radarr, port: http}}
   prowlarr:
     className: traefik
     annotations: *tinyauth
     hosts:
-      - host: arr.kube.autostack.ovh
+      - host: arr.autostack.ovh
         paths:
           - {path: /prowlarr, pathType: Prefix, service: {identifier: prowlarr, port: http}}
   prowlarr-api:
     className: traefik
     hosts:
-      - host: arr.kube.autostack.ovh
+      - host: arr.autostack.ovh
         paths:
           - {path: /prowlarr/api, pathType: Prefix, service: {identifier: prowlarr, port: http}}
   bazarr:
     className: traefik
     annotations: *tinyauth
     hosts:
-      - host: arr.kube.autostack.ovh
+      - host: arr.autostack.ovh
         paths:
           - {path: /bazarr, pathType: Prefix, service: {identifier: bazarr, port: http}}
   bazarr-api:
     className: traefik
     hosts:
-      - host: arr.kube.autostack.ovh
+      - host: arr.autostack.ovh
         paths:
           - {path: /bazarr/api, pathType: Prefix, service: {identifier: bazarr, port: http}}
   # No open /api route here: qBittorrent's own login is bypassed for every
@@ -258,20 +258,20 @@ ingress:
     className: traefik
     annotations: *tinyauth
     hosts:
-      - host: qbit.kube.autostack.ovh
+      - host: qbit.autostack.ovh
         paths:
           - {path: /, pathType: Prefix, service: {identifier: qbittorrent, port: http}}
   # No login, as on Tools
   shelfmark:
     className: traefik
     hosts:
-      - host: shelfmark.kube.autostack.ovh
+      - host: shelfmark.autostack.ovh
         paths:
           - {path: /, pathType: Prefix, service: {identifier: shelfmark, port: http}}
   shelfmark-maman:
     className: traefik
     hosts:
-      - host: shelfmark-maman.kube.autostack.ovh
+      - host: shelfmark-maman.autostack.ovh
         paths:
           - {path: /, pathType: Prefix, service: {identifier: shelfmark-maman, port: http}}
 

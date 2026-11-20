@@ -3,7 +3,7 @@
 # (Homelab-infra: ansible/configure/argocd.yaml) with a minimal subset of these
 # values; keep the two in step for anything needed to reach this repo.
 global:
-  domain: argocd.kube.autostack.ovh
+  domain: argocd.autostack.ovh
 
 configs:
   params:
@@ -28,8 +28,8 @@ repoServer:
   resources:
     requests: {cpu: 50m, memory: 128Mi}
 server:
-  # UI on argocd.kube.autostack.ovh (hostname defaults to global.domain).
-  # *.kube.autostack.ovh points at k8s-cp-1 until kube-vip provides a floating IP
+  # UI on argocd.autostack.ovh (hostname defaults to global.domain).
+  # *.autostack.ovh points at k8s-cp-1 until kube-vip provides a floating IP
   ingress:
     enabled: true
     ingressClassName: traefik

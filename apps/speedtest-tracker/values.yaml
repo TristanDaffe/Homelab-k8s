@@ -39,7 +39,7 @@ ingress:
   app:
     className: traefik
     hosts:
-      - host: speedtest.kube.autostack.ovh
+      - host: speedtest.autostack.ovh
         paths:
           - path: /
             pathType: Prefix

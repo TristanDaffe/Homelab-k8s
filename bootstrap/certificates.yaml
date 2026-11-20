@@ -1,4 +1,4 @@
-# Wildcard *.kube.autostack.ovh + Traefik default certificate, see
+# Wildcard *.autostack.ovh + Traefik default certificate, see
 # infrastructure/certificates. Retries until cert-manager's CRDs exist.
 apiVersion: argoproj.io/v1alpha1
 kind: Application

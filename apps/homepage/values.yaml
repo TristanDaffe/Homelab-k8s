@@ -17,7 +17,7 @@ controllers:
           tag: v2.8.0
         env:
           TZ: Europe/Brussels
-          HOMEPAGE_ALLOWED_HOSTS: home.kube.autostack.ovh
+          HOMEPAGE_ALLOWED_HOSTS: home.autostack.ovh
         envFrom:
           - secretRef:
               name: homepage-widgets
@@ -41,7 +41,7 @@ ingress:
   app:
     className: traefik
     hosts:
-      - host: home.kube.autostack.ovh
+      - host: home.autostack.ovh
         paths:
           - path: /
             pathType: Prefix
@@ -263,9 +263,9 @@ configMaps:
               ping: http://ha.home
           - Mealie:
               icon: mealie.png
-              href: https://meal.kube.autostack.ovh
+              href: https://meal.autostack.ovh
               description: Gestion de recettes
-              ping: https://meal.kube.autostack.ovh
+              ping: https://meal.autostack.ovh
               widget:
                 type: mealie
                 url: http://mealie.mealie.svc.cluster.local:9000
@@ -297,9 +297,9 @@ configMaps:
                   # enableMediaControl: false
             - Seer:
                 icon: seerr.png
-                href: https://seer.kube.autostack.ovh
+                href: https://seer.autostack.ovh
                 description: Demande de films et series
-                ping: https://seer.kube.autostack.ovh
+                ping: https://seer.autostack.ovh
                 widget:
                   type: seerr
                   url: http://seerr.seerr.svc.cluster.local:5055
@@ -328,50 +328,50 @@ configMaps:
                   password: {{HOMEPAGE_VAR_CALIBRE_PASS}}
             - Téléchargement de livres:
                 icon: https://developer.asustor.com/uploadIcons/0020_999_1573465183_calibre-web_256.png
-                href: https://shelfmark.kube.autostack.ovh
+                href: https://shelfmark.autostack.ovh
                 description: Téléchargement de livres
-                ping: https://shelfmark.kube.autostack.ovh
+                ping: https://shelfmark.autostack.ovh
             - Téléchargement de livres maman:
                 icon: https://developer.asustor.com/uploadIcons/0020_999_1573465183_calibre-web_256.png
-                href: https://shelfmark-maman.kube.autostack.ovh
+                href: https://shelfmark-maman.autostack.ovh
                 description: Téléchargement de livres
-                ping: https://shelfmark-maman.kube.autostack.ovh
+                ping: https://shelfmark-maman.autostack.ovh
 
         - Torrenting:
           - Media-management:
             - Download-management:
               - Radarr:
                   icon: radarr.png
-                  href: https://arr.kube.autostack.ovh/radarr
+                  href: https://arr.autostack.ovh/radarr
                   description: Téléchargement de films
-                  ping: https://arr.kube.autostack.ovh/radarr
+                  ping: https://arr.autostack.ovh/radarr
                   widget:
                     type: radarr
                     url: http://radarr.media-management.svc.cluster.local:7878/radarr
                     key: {{HOMEPAGE_VAR_RADARR_API_KEY}}
               - Sonarr:
                   icon: sonarr.png
-                  href: https://arr.kube.autostack.ovh/sonarr
+                  href: https://arr.autostack.ovh/sonarr
                   description: Téléchargement de séries
-                  ping: https://arr.kube.autostack.ovh/sonarr
+                  ping: https://arr.autostack.ovh/sonarr
                   widget:
                     type: sonarr
                     url: http://sonarr.media-management.svc.cluster.local:8989/sonarr
                     key: {{HOMEPAGE_VAR_SONARR_API_KEY}}
               - Bazarr:
                   icon: bazarr.png
-                  href: https://arr.kube.autostack.ovh/bazarr
+                  href: https://arr.autostack.ovh/bazarr
                   description: Téléchargement de sous-titres
-                  ping: https://arr.kube.autostack.ovh/bazarr
+                  ping: https://arr.autostack.ovh/bazarr
                   widget:
                     type: bazarr
                     url: http://bazarr.media-management.svc.cluster.local:6767/bazarr
                     key: {{HOMEPAGE_VAR_BAZARR_API_KEY}}
               - Prowlarr:
                   icon: prowlarr.png
-                  href: https://arr.kube.autostack.ovh/prowlarr
+                  href: https://arr.autostack.ovh/prowlarr
                   description: Gestion des indexeurs
-                  ping: https://arr.kube.autostack.ovh/prowlarr
+                  ping: https://arr.autostack.ovh/prowlarr
                   widget:
                     type: prowlarr
                     url: http://prowlarr.media-management.svc.cluster.local:9696/prowlarr
@@ -379,9 +379,9 @@ configMaps:
             - Torrent:
               - qBittorrent:
                   icon: qbittorrent.png
-                  href: https://qbit.kube.autostack.ovh
+                  href: https://qbit.autostack.ovh
                   description: Téléchargement de torrents
-                  ping: https://qbit.kube.autostack.ovh
+                  ping: https://qbit.autostack.ovh
                   widget:
                     type: qbittorrent
                     url: http://qbittorrent.media-management.svc.cluster.local:8080
@@ -401,19 +401,19 @@ configMaps:
                       service_group: Download-management
                       service_name: Sonarr
                       color: teal
-                      baseUrl: https://arr.kube.autostack.ovh/sonarr
+                      baseUrl: https://arr.autostack.ovh/sonarr
                     - type: radarr
                       service_group: Download-management
                       service_name: Radarr
                       color: red
-                      baseUrl: https://arr.kube.autostack.ovh/radarr
+                      baseUrl: https://arr.autostack.ovh/radarr
 
         - Tools and stuff:
           - ItTools:
               icon: it-tools.png
-              href: https://it-tools.kube.autostack.ovh
+              href: https://it.tools.autostack.ovh
               description: Outils divers pour l'IT
-              ping: https://it-tools.kube.autostack.ovh
+              ping: https://it.tools.autostack.ovh
 
         ################
         # Admin tab
@@ -444,14 +444,14 @@ configMaps:
         - Monitoring:
           - Grafana:
               icon: grafana.png
-              href: https://grafana.kube.autostack.ovh
+              href: https://grafana.autostack.ovh
               description: Dashboards
-              ping: https://grafana.kube.autostack.ovh
+              ping: https://grafana.autostack.ovh
           - Prometheus:
               icon: prometheus.png
-              href: https://prometheus.kube.autostack.ovh
+              href: https://prometheus.autostack.ovh
               description: Métriques
-              ping: https://prometheus.kube.autostack.ovh
+              ping: https://prometheus.autostack.ovh
               widget:
                 type: prometheus
                 url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
@@ -541,9 +541,9 @@ configMaps:
                   password: {{HOMEPAGE_VAR_NPM_PASS}}
             - Speedtest:
                 icon: speedtest-tracker.png
-                href: https://speedtest.kube.autostack.ovh
+                href: https://speedtest.autostack.ovh
                 description: Suivi des tests de vitesse
-                ping: https://speedtest.kube.autostack.ovh
+                ping: https://speedtest.autostack.ovh
                 widget:
                   type: speedtest
                   url: http://speedtest-tracker.speedtest-tracker.svc.cluster.local
@@ -558,18 +558,18 @@ configMaps:
         - Paper-work:
             - Paperless-ngx:
                 icon: paperless.png
-                href: https://paper.kube.autostack.ovh
+                href: https://paper.autostack.ovh
                 description: Gestion de documents
-                ping: https://paper.kube.autostack.ovh
+                ping: https://paper.autostack.ovh
                 widget:
                   type: paperlessngx
                   url: http://paperless.paperless.svc.cluster.local:8000
                   key: {{HOMEPAGE_VAR_PAPERLESS_TOKEN}}
             - actual-budget:
                 icon: actual-budget.png
-                href: https://budget.kube.autostack.ovh
+                href: https://budget.autostack.ovh
                 description: Gestion de budget
-                ping: https://budget.kube.autostack.ovh
+                ping: https://budget.autostack.ovh
       bookmarks.yaml: |
         # https://tinyauth.app/docs/about
         # https://pocket-id.org/docs

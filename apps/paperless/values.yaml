@@ -22,13 +22,13 @@ controllers:
           PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
           PAPERLESS_TIKA_ENDPOINT: http://tika:9998
           PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
-          PAPERLESS_URL: https://paper.kube.autostack.ovh
+          PAPERLESS_URL: https://paper.autostack.ovh
           # Also the in-cluster name, for Homepage's widget (Django rejects other Hosts)
-          PAPERLESS_ALLOWED_HOSTS: paper.kube.autostack.ovh,paperless.paperless.svc.cluster.local
+          PAPERLESS_ALLOWED_HOSTS: paper.autostack.ovh,paperless.paperless.svc.cluster.local
           PAPERLESS_ACCOUNT_DEFAULT_HTTP_PROTOCOL: https
           PAPERLESS_SECURE_PROXY_SSL_HEADER: HTTP_X_FORWARDED_PROTO,https
           PAPERLESS_USE_X_FORWARDED_HOST: "true"
-          PAPERLESS_CSRF_TRUSTED_ORIGINS: https://paper.kube.autostack.ovh
+          PAPERLESS_CSRF_TRUSTED_ORIGINS: https://paper.autostack.ovh
           PAPERLESS_CSRF_COOKIE_SECURE: "true"
           PAPERLESS_SESSION_COOKIE_SECURE: "true"
           PAPERLESS_TIME_ZONE: Europe/Brussels
@@ -116,7 +116,7 @@ ingress:
   app:
     className: traefik
     hosts:
-      - host: paper.kube.autostack.ovh
+      - host: paper.autostack.ovh
         paths:
           - path: /
             pathType: Prefix

@@ -1,5 +1,5 @@
 # IT-Tools — stateless, first app used to prove Git → Argo CD → cluster → ingress.
-# *.kube.autostack.ovh points at k8s-cp-1 (Traefik); HTTPS uses Traefik's
+# *.autostack.ovh points at k8s-cp-1 (Traefik); HTTPS uses Traefik's
 # self-signed certificate until cert-manager is installed
 controllers:
   it-tools:
@@ -26,7 +26,7 @@ ingress:
   app:
     className: traefik
     hosts:
-      - host: it-tools.kube.autostack.ovh
+      - host: it.tools.autostack.ovh
         paths:
           - path: /
             pathType: Prefix

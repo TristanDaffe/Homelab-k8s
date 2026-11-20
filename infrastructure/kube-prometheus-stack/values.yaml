@@ -29,14 +29,14 @@ defaultRules:
     kubeProxy: false
 
 prometheus:
-  # UI at prometheus.kube.autostack.ovh, behind TinyAuth (Prometheus has no login)
+  # UI at prometheus.autostack.ovh, behind TinyAuth (Prometheus has no login)
   ingress:
     enabled: true
     ingressClassName: traefik
     annotations:
       traefik.ingress.kubernetes.io/router.middlewares: tinyauth-media-forwardauth@kubernetescrd
     hosts:
-      - prometheus.kube.autostack.ovh
+      - prometheus.autostack.ovh
     paths:
       - /
   prometheusSpec:

@@ -34,7 +34,7 @@ ingress:
   app:
     className: traefik
     hosts:
-      - host: seer.kube.autostack.ovh
+      - host: seer.autostack.ovh
         paths:
           - path: /
             pathType: Prefix
