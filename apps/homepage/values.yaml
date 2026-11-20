@@ -411,9 +411,9 @@ configMaps:
         - Tools and stuff:
           - ItTools:
               icon: it-tools.png
-              href: https://it.tools.autostack.ovh
+              href: https://it-tools.autostack.ovh
               description: Outils divers pour l'IT
-              ping: https://it.tools.autostack.ovh
+              ping: https://it-tools.autostack.ovh
 
         ################
         # Admin tab

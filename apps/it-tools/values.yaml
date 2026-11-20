@@ -26,7 +26,7 @@ ingress:
   app:
     className: traefik
     hosts:
-      - host: it.tools.autostack.ovh
+      - host: it-tools.autostack.ovh
         paths:
           - path: /
             pathType: Prefix
