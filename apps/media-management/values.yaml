@@ -117,7 +117,13 @@ controllers:
         resources:
           requests: {cpu: 20m, memory: 128Mi}
           limits: {memory: 512Mi}
-        probes: *tcp-probes
+        # Several minutes before it opens its port on first start
+        probes:
+          liveness: {enabled: true}
+          readiness: {enabled: true}
+          startup:
+            enabled: true
+            spec: {failureThreshold: 30, periodSeconds: 10}
 
   shelfmark-maman:
     containers:
@@ -139,7 +145,13 @@ controllers:
         resources:
           requests: {cpu: 20m, memory: 128Mi}
           limits: {memory: 512Mi}
-        probes: *tcp-probes
+        # Several minutes before it opens its port on first start
+        probes:
+          liveness: {enabled: true}
+          readiness: {enabled: true}
+          startup:
+            enabled: true
+            spec: {failureThreshold: 30, periodSeconds: 10}
 
 service:
   sonarr:
