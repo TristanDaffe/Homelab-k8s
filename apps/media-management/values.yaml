@@ -114,9 +114,10 @@ controllers:
           USE_CF_BYPASS: "true"
           EXT_BYPASSER_URL: http://flaresolverr:8191
           PRIORITIZE_WELIB: "True"
+        # Starts its own Chrome to get past Cloudflare: 512Mi was OOM-killed
         resources:
-          requests: {cpu: 20m, memory: 128Mi}
-          limits: {memory: 512Mi}
+          requests: {cpu: 20m, memory: 256Mi}
+          limits: {memory: 2Gi}
         # Several minutes before it opens its port on first start
         probes:
           liveness: {enabled: true}
@@ -142,9 +143,10 @@ controllers:
           CUSTOM_DNS: google
           USE_DOH: "true"
           BOOK_LANGUAGE: fr
+        # Starts its own Chrome to get past Cloudflare: 512Mi was OOM-killed
         resources:
-          requests: {cpu: 20m, memory: 128Mi}
-          limits: {memory: 512Mi}
+          requests: {cpu: 20m, memory: 256Mi}
+          limits: {memory: 2Gi}
         # Several minutes before it opens its port on first start
         probes:
           liveness: {enabled: true}
