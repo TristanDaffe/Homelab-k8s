@@ -4,8 +4,6 @@
 # State migrated from Tools /docker/volumes/beeper-instagram.
 controllers:
   beeper:
-    # 0 until the data is copied in (final app batch)
-    replicas: 0
     strategy: Recreate
     containers:
       app:

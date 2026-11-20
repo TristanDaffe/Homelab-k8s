@@ -328,14 +328,14 @@ configMaps:
                   password: {{HOMEPAGE_VAR_CALIBRE_PASS}}
             - Téléchargement de livres:
                 icon: https://developer.asustor.com/uploadIcons/0020_999_1573465183_calibre-web_256.png
-                href: https://shelfmark.autostack.ovh
+                href: https://shelfmark.kube.autostack.ovh
                 description: Téléchargement de livres
-                ping: https://shelfmark.autostack.ovh
+                ping: https://shelfmark.kube.autostack.ovh
             - Téléchargement de livres maman:
                 icon: https://developer.asustor.com/uploadIcons/0020_999_1573465183_calibre-web_256.png
-                href: https://shelfmark-maman.autostack.ovh
+                href: https://shelfmark-maman.kube.autostack.ovh
                 description: Téléchargement de livres
-                ping: https://shelfmark-maman.autostack.ovh
+                ping: https://shelfmark-maman.kube.autostack.ovh
 
         - Torrenting:
           - Media-management:
@@ -411,14 +411,9 @@ configMaps:
         - Tools and stuff:
           - ItTools:
               icon: it-tools.png
-              href: https://it.tools.autostack.ovh
+              href: https://it-tools.kube.autostack.ovh
               description: Outils divers pour l'IT
-              ping: https://it.tools.autostack.ovh
-          - Stirling-pdf:
-              icon: stirling-pdf.png
-              href: https://pdf.tools.autostack.ovh
-              description: Outils pour les PDF
-              ping: https://pdf.tools.autostack.ovh
+              ping: https://it-tools.kube.autostack.ovh
 
         ################
         # Admin tab
