@@ -66,8 +66,6 @@ prometheus:
         static_configs:
           - targets: ['192.168.129.125:9100']
             labels: {node: master}
-          - targets: ['192.168.129.124:9100']
-            labels: {node: tools}
           - targets: ['192.168.129.123:9100']
             labels: {node: media}
           - targets: ['192.168.129.129:9100']

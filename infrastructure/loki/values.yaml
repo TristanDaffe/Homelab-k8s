@@ -85,10 +85,9 @@ extraObjects:
       name: loki-push-allowlist
     spec:
       ipAllowList:
-        # Media, Tools, Master, DevTools, Postgres HA members
+        # Media, Master, DevTools, Postgres HA members
         sourceRange:
           - 192.168.129.123/32
-          - 192.168.129.124/32
           - 192.168.129.125/32
           - 192.168.129.129/32
           - 192.168.129.133/32

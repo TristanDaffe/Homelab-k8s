@@ -494,14 +494,6 @@ configMaps:
               widget:
                 type: traefik
                 url: https://traefik.media.autostack.ovh
-          - Traefik Tools:
-              icon: traefik.png
-              href: https://traefik.tools.autostack.ovh
-              description: Traefik - tools
-              ping: https://traefik.tools.autostack.ovh
-              widget:
-                type: traefik
-                url: https://traefik.tools.autostack.ovh
           - Traefik Devtools:
               icon: traefik.png
               href: https://traefik.devtools.autostack.ovh
