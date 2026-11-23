@@ -10,7 +10,7 @@ spec:
   sources:
     - repoURL: https://aureq.github.io/cert-manager-webhook-ovh/
       chart: cert-manager-webhook-ovh
-      targetRevision: 0.9.19
+      targetRevision: 0.9.20
       helm:
         releaseName: cert-manager-webhook-ovh
         valueFiles:
