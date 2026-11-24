@@ -45,7 +45,7 @@ controllers:
       app:
         image:
           repository: ghcr.io/linuxserver/prowlarr
-          tag: 3.0.2
+          tag: 3.1.0
         env: *lsio-env
         resources:
           requests: {cpu: 20m, memory: 128Mi}
