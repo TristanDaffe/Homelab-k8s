@@ -9,7 +9,7 @@ controllers:
       app:
         image:
           repository: ghcr.io/beeper/bridge-manager
-          tag: latest@sha256:7870dbd2bcef148ec01937aaf92047c0b08c1d64b23b024dfa156c08eadf366e
+          tag: latest@sha256:7cc237189b9ce4d95c27c22ba37bbe2e7216c0d552f56243c506b4b4f9da87ef
         args: [sh-instagram]
         env:
           TZ: Europe/Brussels
