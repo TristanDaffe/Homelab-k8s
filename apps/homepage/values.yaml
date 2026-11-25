@@ -427,14 +427,14 @@ configMaps:
               ping: https://192.168.129.110:8006
           - Portainer:
               icon: portainer.png
-              href: https://portainer.autostack.ovh
+              href: https://portainer.dev.autostack.ovh
               description: Portainer
-              ping: https://portainer.autostack.ovh
+              ping: https://portainer.dev.autostack.ovh
           - Mesh-mini:
               icon: meshcentral.png
-              href: https://mesh-mini.autostack.ovh
+              href: https://mesh-mini.dev.autostack.ovh
               description: Mesh-mini
-              ping: https://mesh-mini.autostack.ovh
+              ping: https://mesh-mini.dev.autostack.ovh
           - Pocket-ID:
               icon: pocket-id.png
               href: https://pocket-id.autostack.ovh
@@ -507,9 +507,9 @@ configMaps:
           - Backup:
             - Zerobyte:
                 icon: zerobyte.png
-                href: https://zerobyte.autostack.ovh
+                href: https://zerobyte.dev.autostack.ovh
                 description: Sauvegardes fichiers
-                ping: https://zerobyte.autostack.ovh
+                ping: https://zerobyte.dev.autostack.ovh
             - RustFS:
                 icon: rustfs.png
                 href: https://bucket.autostack.ovh
