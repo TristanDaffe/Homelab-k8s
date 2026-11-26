@@ -99,7 +99,7 @@ controllers:
       app:
         image:
           repository: ghcr.io/calibrain/shelfmark
-          tag: v1.7.1
+          tag: v1.7.2
         env:
           FLASK_PORT: "8084"
           LOG_LEVEL: info
@@ -131,7 +131,7 @@ controllers:
       app:
         image:
           repository: ghcr.io/calibrain/shelfmark
-          tag: v1.7.1
+          tag: v1.7.2
         env:
           FLASK_PORT: "8084"
           LOG_LEVEL: info
